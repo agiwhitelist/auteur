@@ -1,0 +1,34 @@
+name: CI
+
+# Honesty gate: every page shipped in docs/ must pass the skill's own
+# anti-slop linter. If a showcase site or the landing regresses into slop,
+# this fails — so the "0 fails / 0 warns" claim in the README cannot rot.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  slopscan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Anti-slop gate on every shipped page
+        run: |
+          set -e
+          fail=0
+          for dir in docs docs/showcase/flux docs/showcase/static docs/showcase/swarm docs/showcase/drift; do
+            echo "::group::slopscan $dir"
+            node scripts/slopscan.mjs "$dir" || fail=1
+            echo "::endgroup::"
+          done
+          if [ "$fail" -ne 0 ]; then
+            echo "::error::slopscan found slop in a shipped page — the launch claim is broken."
+            exit 1
+          fi
+          echo "All shipped pages clean: 0 fails, 0 warns."

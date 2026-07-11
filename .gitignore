@@ -1,0 +1,10 @@
+node_modules/
+*.log
+.DS_Store
+Thumbs.db
+# playwright / QA artifacts
+test-results/
+playwright-report/
+_*.mjs
+**/shots/
+**/*-capture.png

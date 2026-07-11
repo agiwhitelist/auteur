@@ -1,0 +1,846 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#08080a">
+  <meta name="description" content="STATIC is a broadcast, media-art, and motion studio. Live identities, glitch systems, and signal design for stages, screens, and networks.">
+  <title>STATIC | Broadcast · Media Art · Motion</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2308080a'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Impact,Arial Black,sans-serif' font-size='14' fill='%23c7ff2e'%3ES%3C/text%3E%3C/svg%3E">
+  <style>
+    :root {
+      --ink: #08080a;
+      --paper: #f2f2f0;
+      --chartreuse: #c7ff2e;
+      --signal: #ff2f3e;
+      --muted: #9a9a96;
+      --display: Impact, "Arial Black", "Helvetica Neue", Haettenschweiler, sans-serif;
+      --text: system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --mono: Consolas, "SF Mono", "Courier New", monospace;
+    }
+    * { box-sizing: border-box; }
+    html { background: var(--ink); scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--paper);
+      background: var(--ink);
+      font-family: var(--text);
+      line-height: 1.5;
+      overflow-x: clip;
+    }
+    a { color: inherit; }
+    a:focus-visible, button:focus-visible {
+      outline: 3px solid var(--chartreuse);
+      outline-offset: 4px;
+    }
+    .skip {
+      position: fixed;
+      z-index: 40;
+      top: 1rem;
+      left: 1rem;
+      padding: .65rem 1rem;
+      background: var(--chartreuse);
+      color: var(--ink);
+      font-family: var(--mono);
+      font-size: .8rem;
+      text-decoration: none;
+      transform: translateY(-200%);
+    }
+    .skip:focus { transform: translateY(0); }
+
+    /* ── HERO ─────────────────────────────────────────────── */
+    .hero {
+      position: relative;
+      height: 100svh;
+      min-height: 36rem;
+      overflow: hidden;
+      isolation: isolate;
+      background: var(--ink);
+      color: var(--paper);
+      touch-action: none;
+      cursor: crosshair;
+    }
+    #gl {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      visibility: hidden;
+      z-index: 2;
+    }
+    .webgl-ready #gl { visibility: visible; }
+    .poster {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+      background:
+        repeating-linear-gradient(
+          0deg,
+          transparent 0 3px,
+          rgba(242, 242, 240, 0.028) 3px 4px
+        ),
+        radial-gradient(ellipse 70% 55% at 50% 48%, #101014 0%, var(--ink) 72%);
+    }
+    .poster-word {
+      position: relative;
+      margin: 0;
+      font-family: var(--display);
+      font-size: clamp(5.5rem, 22vw, 18rem);
+      line-height: .82;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+      color: var(--paper);
+      text-align: center;
+      transform: scaleX(1.04);
+      /* crisp bone body; 1–3px RGB fringe only (no green wash) */
+      text-shadow:
+        -2px 0 0 var(--signal),
+        2px 0 0 var(--chartreuse);
+    }
+    .webgl-ready .poster { opacity: 0; }
+    .hero-chrome {
+      position: absolute;
+      z-index: 4;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: clamp(1rem, 2.5vw, 2rem);
+      pointer-events: none;
+    }
+    .hero-chrome a { pointer-events: auto; text-decoration: none; }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      font-family: var(--mono);
+      font-size: .9rem;
+      letter-spacing: 0.04em;
+    }
+    .mark {
+      font-family: var(--display);
+      font-size: 1.35rem;
+      letter-spacing: -0.02em;
+      color: var(--chartreuse);
+    }
+    .live {
+      display: inline-flex;
+      align-items: center;
+      gap: .55rem;
+    }
+    .live::before {
+      content: "";
+      width: .55rem;
+      height: .55rem;
+      border-radius: 50%;
+      background: var(--signal);
+      box-shadow: 0 0 12px var(--signal);
+    }
+    .hero-foot {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(12rem, 22rem);
+      gap: clamp(1rem, 3vw, 2.5rem);
+      align-items: end;
+    }
+    .hero-foot p {
+      margin: 0;
+      max-width: 34rem;
+      font-size: clamp(1rem, 1.5vw, 1.25rem);
+      line-height: 1.4;
+      text-wrap: pretty;
+      text-shadow: 0 2px 18px #000;
+    }
+    .cue {
+      justify-self: end;
+      font-family: var(--mono);
+      font-size: .9rem;
+      letter-spacing: 0.03em;
+      color: var(--chartreuse);
+      text-shadow: 0 2px 12px #000;
+    }
+    .cue span {
+      display: block;
+      margin-top: .35rem;
+      color: var(--paper);
+      opacity: .75;
+    }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* ── CONTENT ──────────────────────────────────────────── */
+    main { position: relative; z-index: 1; }
+    .about {
+      display: grid;
+      grid-template-columns: minmax(8rem, 0.85fr) minmax(16rem, 1.6fr);
+      gap: clamp(2rem, 6vw, 6rem);
+      padding: clamp(4.5rem, 10vw, 9rem) clamp(1rem, 4vw, 4rem);
+      background: var(--chartreuse);
+      color: var(--ink);
+    }
+    .about h2 {
+      margin: 0;
+      font-family: var(--display);
+      font-size: clamp(3.5rem, 9vw, 7.5rem);
+      line-height: .85;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+      transform: rotate(-1.5deg);
+    }
+    .about-copy {
+      padding-top: clamp(1rem, 6vw, 5rem);
+      max-width: 42rem;
+    }
+    .about-copy p {
+      margin: 0 0 1.25rem;
+      font-size: clamp(1.15rem, 2vw, 1.55rem);
+      line-height: 1.35;
+      letter-spacing: -0.015em;
+      max-width: 38ch;
+    }
+    .about-copy p:last-child {
+      margin: 0;
+      font-size: 1rem;
+      line-height: 1.55;
+      max-width: 52ch;
+      color: #1a2208;
+    }
+
+    .works {
+      padding: clamp(4rem, 8vw, 7rem) 0;
+      background: var(--ink);
+    }
+    .works-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 1.5rem;
+      padding: 0 clamp(1rem, 4vw, 4rem) clamp(2rem, 4vw, 3.5rem);
+    }
+    .works-head h2 {
+      margin: 0;
+      max-width: 10ch;
+      font-family: var(--display);
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      line-height: .88;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+    }
+    .works-head p {
+      margin: 0;
+      max-width: 28ch;
+      font-family: var(--mono);
+      font-size: .95rem;
+      letter-spacing: 0.02em;
+      color: var(--muted);
+      text-align: right;
+    }
+    .work {
+      display: grid;
+      grid-template-columns: minmax(4rem, 8rem) minmax(0, 1fr) minmax(0, 1.2fr);
+      gap: clamp(1rem, 3vw, 3rem);
+      align-items: start;
+      padding: clamp(2rem, 4vw, 3.5rem) clamp(1rem, 4vw, 4rem);
+      border-top: 2px solid rgba(242, 242, 240, 0.18);
+    }
+    .work:last-child { border-bottom: 2px solid rgba(242, 242, 240, 0.18); }
+    .work:nth-child(2) {
+      background: #0e0e12;
+      padding-left: clamp(2rem, 8vw, 8rem);
+    }
+    .work:nth-child(3) {
+      background: var(--signal);
+      color: var(--ink);
+      border-top-color: transparent;
+      border-bottom-color: transparent;
+    }
+    .work:nth-child(3) .ch,
+    .work:nth-child(3) .meta { color: rgba(8, 8, 10, 0.7); }
+    .work:nth-child(4) {
+      padding-right: clamp(2rem, 10vw, 12rem);
+    }
+    .ch {
+      font-family: var(--mono);
+      font-size: .95rem;
+      letter-spacing: 0.04em;
+      color: var(--chartreuse);
+      padding-top: .35rem;
+    }
+    .work h3 {
+      margin: 0 0 .75rem;
+      font-family: var(--display);
+      font-size: clamp(2rem, 4.5vw, 3.8rem);
+      line-height: .9;
+      letter-spacing: -0.025em;
+      text-transform: uppercase;
+    }
+    .work p {
+      margin: 0;
+      max-width: 48ch;
+      font-size: clamp(1rem, 1.35vw, 1.2rem);
+      line-height: 1.5;
+    }
+    .meta {
+      font-family: var(--mono);
+      font-size: .9rem;
+      letter-spacing: 0.02em;
+      line-height: 1.55;
+      color: var(--muted);
+    }
+
+    .contact {
+      min-height: 78svh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: clamp(3rem, 7vw, 6rem) clamp(1rem, 4vw, 4rem);
+      background: var(--paper);
+      color: var(--ink);
+    }
+    .contact-kicker {
+      font-family: var(--mono);
+      font-size: 1rem;
+      letter-spacing: 0.02em;
+      max-width: 42ch;
+    }
+    .contact a.mail {
+      display: inline-block;
+      margin-top: 1.5rem;
+      font-family: var(--display);
+      font-size: clamp(3.2rem, 12vw, 10rem);
+      line-height: .85;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+      text-decoration: underline;
+      text-decoration-thickness: 0.045em;
+      text-underline-offset: 0.08em;
+      color: var(--ink);
+      transition: transform 140ms ease-out, color 140ms ease-out;
+    }
+    .contact a.mail:hover {
+      transform: translateX(0.04em);
+      color: var(--signal);
+    }
+    .site-foot {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding-top: 3rem;
+      font-family: var(--mono);
+      font-size: .8rem;
+      letter-spacing: 0.04em;
+    }
+
+    @media (max-width: 760px) {
+      .hero-foot { grid-template-columns: 1fr; }
+      .cue { justify-self: start; }
+      .about { grid-template-columns: 1fr; }
+      .about-copy { padding-top: 0; }
+      .works-head { flex-direction: column; align-items: start; }
+      .works-head p { text-align: left; }
+      .work {
+        grid-template-columns: auto 1fr;
+        padding-left: clamp(1rem, 4vw, 4rem) !important;
+        padding-right: clamp(1rem, 4vw, 4rem) !important;
+      }
+      .work p { grid-column: 1 / -1; }
+      .meta { grid-column: 1 / -1; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .contact a.mail { transition-duration: 0.01ms; }
+      .cue { display: none; }
+      .live::before { box-shadow: none; }
+      /* crisp poster, no continuous glitch animation */
+      .poster {
+        opacity: 1 !important;
+        background:
+          repeating-linear-gradient(0deg, transparent 0 3px, rgba(242,242,240,.03) 3px 4px),
+          var(--ink);
+      }
+      .poster-word {
+        text-shadow:
+          -2px 0 0 var(--signal),
+          2px 0 0 var(--chartreuse);
+      }
+      #gl { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#studio">Skip to studio</a>
+
+  <header class="hero" id="top">
+    <canvas id="gl" aria-hidden="true"></canvas>
+    <div class="poster" aria-hidden="true">
+      <p class="poster-word">STATIC</p>
+    </div>
+    <div class="hero-chrome">
+      <nav class="topbar" aria-label="Primary">
+        <a class="mark" href="#top">STATIC</a>
+        <span class="live">CH-01 · ON AIR</span>
+        <a href="#contact">Book a feed</a>
+      </nav>
+      <h1 class="sr-only">STATIC: broadcast, media art, and motion studio</h1>
+      <div class="hero-foot">
+        <p>Broadcast systems, media-art installations, and motion identities built to tear, recover, and stay loud under pressure.</p>
+        <p class="cue">Drag the type · shred the signal<span>Still cursor re-forms the feed</span></p>
+      </div>
+    </div>
+    <noscript>
+      <style>#gl{display:none!important}.poster{opacity:1!important}</style>
+    </noscript>
+  </header>
+
+  <main id="studio">
+    <section class="about" aria-labelledby="about-title">
+      <h2 id="about-title">We break<br>the feed<br>on purpose.</h2>
+      <div class="about-copy">
+        <p>STATIC is a broadcast, media-art, and motion studio for brands and venues that need more than a clean logo on a black slide.</p>
+        <p>We design live visual systems: datamosh type, reactive stages, network-native identities, and show packages that feel like a channel you can grab with your hands.</p>
+      </div>
+    </section>
+
+    <section class="works" aria-labelledby="works-title">
+      <div class="works-head">
+        <h2 id="works-title">What we put on air</h2>
+        <p>Three channels. One signal language.</p>
+      </div>
+
+      <article class="work">
+        <div class="ch">CH · A</div>
+        <div>
+          <h3>Live broadcast packages</h3>
+          <p>Lower-thirds, stings, full-screen bugs, and reactive openers for stream, LED wall, and hybrid events. Built to hold up when the director calls a hard cut mid-glitch.</p>
+        </div>
+        <div class="meta">
+          Stages · Streams · LED<br>
+          Realtime type systems<br>
+          Show control ready
+        </div>
+      </article>
+
+      <article class="work">
+        <div class="ch">CH · B</div>
+        <div>
+          <h3>Media-art installations</h3>
+          <p>Room-scale signal rooms and interactive surfaces where visitors push noise, tear frames, and write their own interference into the piece.</p>
+        </div>
+        <div class="meta">
+          Museums · Festivals<br>
+          Sensor + GPU loops<br>
+          Durable public modes
+        </div>
+      </article>
+
+      <article class="work">
+        <div class="ch">CH · C</div>
+        <div>
+          <h3>Motion identity systems</h3>
+          <p>Brand languages with rules for rupture and recovery: how the mark shreds, how color splits, how sound hits the frame. Not a style guide PDF that dies in a folder.</p>
+        </div>
+        <div class="meta">
+          Launch kits · Campaigns<br>
+          Toolkits + shaders<br>
+          Network-native assets
+        </div>
+      </article>
+    </section>
+
+    <section class="contact" id="contact">
+      <div>
+        <p class="contact-kicker">Have a launch, stage, or channel that should feel unstable in the right way?</p>
+        <a class="mail" href="mailto:desk@static.studio">desk@static.studio</a>
+      </div>
+      <footer class="site-foot">
+        <span>STATIC / Broadcast · Media art · Motion</span>
+        <span>Berlin · Seoul · The network</span>
+        <span>© 2026</span>
+      </footer>
+    </section>
+  </main>
+
+  <script>
+  (() => {
+    'use strict';
+
+    const canvas = document.getElementById('gl');
+    if (!canvas) return;
+
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) return;
+
+    const gl = canvas.getContext('webgl2', {
+      alpha: false,
+      antialias: false,
+      depth: false,
+      stencil: false,
+      preserveDrawingBuffer: false,
+      powerPreference: 'high-performance'
+    });
+    if (!gl) return;
+
+    canvas.addEventListener('webglcontextlost', (e) => {
+      e.preventDefault();
+      document.documentElement.classList.remove('webgl-ready');
+    }, { passive: false });
+
+    const VERT = `#version 300 es
+precision highp float;
+const vec2 POS[3] = vec2[3](vec2(-1.0,-1.0), vec2(3.0,-1.0), vec2(-1.0,3.0));
+out vec2 vUv;
+void main(){
+  vec2 p = POS[gl_VertexID];
+  vUv = p * 0.5 + 0.5;
+  gl_Position = vec4(p, 0.0, 1.0);
+}`;
+
+    const FRAG = `#version 300 es
+precision highp float;
+in vec2 vUv;
+out vec4 outColor;
+
+uniform sampler2D uTex;
+uniform vec2 uRes;
+uniform vec2 uMouse;
+uniform float uTime;
+uniform float uVel;
+uniform float uScroll;
+uniform float uForm;
+
+float hash(vec2 p){
+  p = fract(p * vec2(123.34, 456.21));
+  p += dot(p, p + 45.32);
+  return fract(p.x * p.y);
+}
+float noise(vec2 p){
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  float a = hash(i);
+  float b = hash(i + vec2(1.0, 0.0));
+  float c = hash(i + vec2(0.0, 1.0));
+  float d = hash(i + vec2(1.0, 1.0));
+  vec2 u = f * f * (3.0 - 2.0 * f);
+  return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+}
+
+void main(){
+  vec2 uv = vUv;
+  vec2 aspect = vec2(uRes.x / uRes.y, 1.0);
+  vec2 m = uMouse;
+  float dist = length((uv - m) * aspect);
+
+  // Cursor falloff + velocity / scroll energy
+  // Motion drives almost all shred; rest is near-zero.
+  float near = smoothstep(0.55, 0.0, dist);
+  float energy = clamp(uVel * 1.45 + uScroll * 0.85, 0.0, 1.8);
+  float motion = smoothstep(0.015, 0.42, energy);          // 0 at rest → 1 under drag
+  float formAmt = clamp(uForm, 0.0, 1.0);                  // 1 = fully reformed / crisp
+  float shred = (1.0 - formAmt) * motion;                  // dramatic tear only when moving
+  float glitch = shred * (0.55 + near * 0.55 + energy * 0.7);
+
+  // ── Occasional brief micro-glitch line (even at rest; rare, 1 band) ──
+  float microBand = floor(uv.y * 96.0);
+  float microTick = floor(uTime * 2.8);
+  float microTrig = hash(vec2(microBand * 0.37, microTick));
+  float microOn = step(0.992, microTrig) * (1.0 - motion * 0.85);
+  float microShift = (hash(vec2(microBand, microTick + 1.7)) - 0.5) * 0.012 * microOn;
+
+  // Block / datamosh horizontal slices — ONLY under motion energy
+  float bandH = mix(0.04, 0.011, clamp(energy, 0.0, 1.0));
+  float band = floor(uv.y / bandH);
+  float bandN = hash(vec2(band, floor(uTime * 11.0 + energy * 3.0)));
+  float bandN2 = hash(vec2(band * 1.7, floor(uTime * 4.3)));
+  float tear = (bandN - 0.5) * glitch * (0.05 + energy * 0.14);
+  if (bandN2 > 0.78 - energy * 0.22) {
+    tear += (bandN2 - 0.5) * glitch * 0.22 * energy;
+  }
+  float scrollTear = sin(band * 2.1 + uTime * 18.0) * uScroll * 0.09 * glitch;
+  uv.x += tear + scrollTear + microShift;
+
+  // Vertical micro-jitter near cursor — motion only
+  uv.y += (noise(vec2(uv.x * 40.0, uTime * 8.0)) - 0.5) * glitch * near * 0.022;
+
+  // Chromatic aberration: ~1–3px at rest, wide under fast drag
+  // dir follows cursor so fringe feels interactive without filling the glyph
+  float splitPx = mix(2.0, 4.0 + energy * 22.0 + near * 10.0, motion);
+  float split = splitPx / max(uRes.x, 1.0);
+  vec2 dir = normalize((uv - m) * aspect + 0.0001);
+  dir = vec2(dir.x / aspect.x, dir.y);
+  // at rest use pure horizontal fringe (broadcast look, max legibility)
+  vec2 restDir = vec2(1.0, 0.0);
+  vec2 splitDir = mix(restDir, dir, motion);
+
+  float m0 = texture(uTex, uv).r;
+  float mR = texture(uTex, uv + splitDir * split * 1.1).r;
+  float mG = texture(uTex, uv - splitDir * split * 0.95).r;
+
+  // Paint: near-black field, bone/white body, chartreuse+red ACCENT fringe only
+  vec3 ink = vec3(0.031, 0.031, 0.039);       // #08080a
+  vec3 paper = vec3(0.949, 0.949, 0.941);     // bone
+  vec3 chartreuse = vec3(0.78, 1.0, 0.18);    // #c7ff2e accent
+  vec3 signal = vec3(1.0, 0.184, 0.243);      // #ff2f3e accent
+
+  float body = smoothstep(0.20, 0.68, m0);
+  float redGhost = smoothstep(0.20, 0.68, mR);
+  float greenGhost = smoothstep(0.20, 0.68, mG);
+
+  // Edge-only fringe: colored only where offset sample extends past the body
+  float redFringe = max(0.0, redGhost - body);
+  float greenFringe = max(0.0, greenGhost - body);
+  // Under motion, allow controlled bleed into body edges (hot glitch) — not a wash
+  float bleed = motion * energy * (0.35 + near * 0.4);
+
+  vec3 col = ink;
+  // Type body = bone/white (crisp at rest)
+  col = mix(col, paper, body);
+  // RGB-split fringe accents
+  col = mix(col, signal, redFringe * mix(0.95, 1.0, motion));
+  col = mix(col, chartreuse, greenFringe * mix(0.9, 1.0, motion));
+  // Motion-only hot edge bleed into glyph (still accent, not fill)
+  col = mix(col, signal, body * redGhost * bleed * 0.45);
+  col = mix(col, chartreuse, body * greenGhost * bleed * 0.35);
+  // Keep core of letter bone-white so wordmark stays legible
+  float core = body * (1.0 - bleed * 0.55);
+  col = mix(col, paper, core * 0.55 * body);
+
+  // Scanlines — monochrome, no green cast
+  float scan = 0.90 + 0.10 * sin(vUv.y * uRes.y * 3.14159);
+  col *= mix(1.0, scan, 0.4 + glitch * 0.35);
+
+  // Analog noise (subtle; no full-frame strobe)
+  float n = hash(vUv * uRes + floor(uTime * 20.0));
+  col += (n - 0.5) * (0.02 + glitch * 0.06 + energy * 0.035);
+
+  // Soft vignette; phosphor only on motion (no rest green glow)
+  float vig = 1.0 - 0.34 * dot(vUv - 0.5, vUv - 0.5);
+  float bloom = body * motion * (0.04 + energy * 0.08 + near * 0.06);
+  col += signal * bloom * 0.18 + chartreuse * bloom * 0.14;
+  col *= vig;
+
+  // Rolling bar — faint paper tint at rest, slight accent under energy
+  float roll = smoothstep(0.018, 0.0, abs(fract(vUv.y * 0.32 + uTime * 0.07) - 0.5) - 0.485);
+  col += paper * roll * 0.025;
+  col += chartreuse * roll * 0.03 * motion * energy;
+
+  // Micro-line highlight (brief white/red tick, not green fill)
+  col += signal * microOn * body * 0.12;
+
+  col = clamp(col, 0.0, 1.12);
+  outColor = vec4(col, 1.0);
+}`;
+
+    function compile(type, src) {
+      const s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+        throw new Error(gl.getShaderInfoLog(s) || 'shader compile failed');
+      }
+      return s;
+    }
+
+    const prog = gl.createProgram();
+    gl.attachShader(prog, compile(gl.VERTEX_SHADER, VERT));
+    gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FRAG));
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+      throw new Error(gl.getProgramInfoLog(prog) || 'link failed');
+    }
+    gl.useProgram(prog);
+    gl.bindVertexArray(gl.createVertexArray());
+
+    const uTex = gl.getUniformLocation(prog, 'uTex');
+    const uRes = gl.getUniformLocation(prog, 'uRes');
+    const uMouse = gl.getUniformLocation(prog, 'uMouse');
+    const uTime = gl.getUniformLocation(prog, 'uTime');
+    const uVel = gl.getUniformLocation(prog, 'uVel');
+    const uScroll = gl.getUniformLocation(prog, 'uScroll');
+    const uForm = gl.getUniformLocation(prog, 'uForm');
+
+    const wordTex = gl.createTexture();
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, wordTex);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.uniform1i(uTex, 0);
+
+    function paintWord() {
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      const tw = Math.min(2048, Math.max(1024, Math.round((canvas.clientWidth || 1280) * dpr)));
+      const th = Math.min(1024, Math.max(512, Math.round(tw * 0.42)));
+      const c = document.createElement('canvas');
+      c.width = tw;
+      c.height = th;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, tw, th);
+      ctx.fillStyle = '#fff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      let size = th * 0.72;
+      ctx.font = `900 ${size}px Impact, "Arial Black", sans-serif`;
+      const w = ctx.measureText('STATIC').width;
+      size *= Math.min(1, (tw * 0.92) / Math.max(1, w));
+      ctx.font = `900 ${size}px Impact, "Arial Black", sans-serif`;
+      // slight horizontal stretch via scale
+      ctx.save();
+      ctx.translate(tw / 2, th / 2 + size * 0.04);
+      ctx.scale(1.06, 1);
+      ctx.fillText('STATIC', 0, 0);
+      ctx.restore();
+
+      gl.bindTexture(gl.TEXTURE_2D, wordTex);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, c);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 0);
+    }
+
+    function resize() {
+      const dpr = Math.min(devicePixelRatio || 1, 1.75);
+      const w = Math.max(2, Math.round(canvas.clientWidth * dpr));
+      const h = Math.max(2, Math.round(canvas.clientHeight * dpr));
+      if (canvas.width === w && canvas.height === h) return;
+      canvas.width = w;
+      canvas.height = h;
+      gl.viewport(0, 0, w, h);
+      paintWord();
+    }
+
+    // Pointer state (rAF-throttled)
+    let pointerQueued = false;
+    let latestEvent = null;
+    let mouse = { x: 0.5, y: 0.5 };
+    let lastPtr = null;
+    let velocity = 0;
+    let form = 1.0; // 1 = crisp/reformed, 0 = shredded; stillness rebuilds fast
+
+    canvas.addEventListener('pointermove', (e) => {
+      latestEvent = e;
+      if (pointerQueued) return;
+      pointerQueued = true;
+      requestAnimationFrame(() => {
+        pointerQueued = false;
+        if (!latestEvent) return;
+        const r = canvas.getBoundingClientRect();
+        const x = (latestEvent.clientX - r.left) / Math.max(1, r.width);
+        const y = 1 - (latestEvent.clientY - r.top) / Math.max(1, r.height);
+        let spd = 0;
+        if (lastPtr) {
+          const dx = latestEvent.clientX - lastPtr.x;
+          const dy = latestEvent.clientY - lastPtr.y;
+          spd = Math.hypot(dx, dy);
+        }
+        lastPtr = { x: latestEvent.clientX, y: latestEvent.clientY };
+        mouse.x = x;
+        mouse.y = y;
+        // burst velocity, decay handled in loop
+        velocity = Math.min(1.8, velocity * 0.55 + spd * 0.045);
+      });
+    }, { passive: true });
+
+    canvas.addEventListener('pointerdown', (e) => {
+      lastPtr = { x: e.clientX, y: e.clientY };
+      canvas.setPointerCapture?.(e.pointerId);
+    });
+    canvas.addEventListener('pointerleave', () => { lastPtr = null; });
+    canvas.addEventListener('pointerup', () => { lastPtr = null; });
+
+    // Scroll energy sampled inside the frame loop (no raw scroll listener)
+    let lastScrollY = window.scrollY || 0;
+    let scrollEnergy = 0;
+
+    let active = true;
+    let raf = 0;
+    let lastT = performance.now();
+    let readyChecked = false;
+
+    const io = new IntersectionObserver(([entry]) => {
+      active = entry.isIntersecting;
+      if (active) {
+        lastT = performance.now();
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(loop);
+      }
+    }, { threshold: 0.01 });
+    io.observe(canvas);
+
+    function markReady() {
+      if (readyChecked) return;
+      readyChecked = true;
+      document.documentElement.classList.add('webgl-ready');
+    }
+
+    function loop(now) {
+      if (!active) return;
+      resize();
+
+      const dt = Math.min(0.05, Math.max(0.008, (now - lastT) / 1000));
+      lastT = now;
+
+      // scroll delta without scroll listener
+      const sy = window.scrollY || 0;
+      const sDelta = Math.abs(sy - lastScrollY);
+      lastScrollY = sy;
+      scrollEnergy = Math.min(1.5, scrollEnergy * 0.88 + sDelta * 0.012);
+
+      // velocity decay + quick clean reform when still
+      velocity *= Math.pow(0.88, dt * 60);
+      if (velocity < 0.018) velocity = 0;
+      // Near-zero shred at rest; full tear scales with drag velocity
+      const targetForm = (velocity > 0.08 || scrollEnergy > 0.12)
+        ? Math.max(0.0, 1 - velocity * 0.95 - scrollEnergy * 0.45)
+        : 1.0;
+      // Reform snaps clean (~120–180ms); shred responds to fast drag
+      const formRate = targetForm > form ? 14 : 9;
+      form += (targetForm - form) * Math.min(1, dt * formRate);
+
+      gl.uniform2f(uRes, canvas.width, canvas.height);
+      gl.uniform2f(uMouse, mouse.x, mouse.y);
+      gl.uniform1f(uTime, now * 0.001);
+      gl.uniform1f(uVel, velocity);
+      gl.uniform1f(uScroll, scrollEnergy);
+      gl.uniform1f(uForm, form);
+
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+      markReady();
+
+      raf = requestAnimationFrame(loop);
+    }
+
+    addEventListener('resize', () => { resize(); }, { passive: true });
+    addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        cancelAnimationFrame(raf);
+      } else if (active) {
+        lastT = performance.now();
+        raf = requestAnimationFrame(loop);
+      }
+    });
+
+    // Start crisp (legible at rest); shred only after real cursor energy
+    velocity = 0;
+    form = 1.0;
+    resize();
+    raf = requestAnimationFrame(loop);
+  })();
+  </script>
+</body>
+</html>

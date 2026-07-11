@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#ff8a1e">
+  <meta name="description" content="SWARM is a collective-intelligence and generative-data design lab.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23ff8a1e'/%3E%3Cpath d='M12 18h40v8H22v4h27v16H12v-8h27v-4H12z' fill='%23130804'/%3E%3C/svg%3E">
+  <title>SWARM | Collective Intelligence Lab</title>
+  <style>
+    :root{--amber:#ff8a1e;--hot:#fff7df;--teal:#1fd4c4;--ink:#130804;--paper:#fff8e9;--ease:cubic-bezier(.23,1,.32,1)}
+    *{box-sizing:border-box}
+    html{background:var(--ink);scroll-behavior:smooth}
+    body{margin:0;color:var(--hot);background:var(--ink);font-family:"Trebuchet MS",Arial,sans-serif;overflow-x:hidden}
+    a{color:inherit}
+    .hero{position:relative;isolation:isolate;min-height:100svh;overflow:hidden;background:#1a0902}
+    #swarm{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair;z-index:1;opacity:0}
+    .poster{position:absolute;inset:0;display:grid;place-items:center;overflow:hidden;background:
+      radial-gradient(circle at 50% 48%,rgba(255,138,30,.96) 0 9%,rgba(255,138,30,.35) 25%,transparent 47%),
+      repeating-radial-gradient(ellipse at center,transparent 0 9px,rgba(31,212,196,.12) 10px 11px),#210b03}
+    .poster::before{content:"SWARM";font:900 clamp(4.2rem,17vw,16rem)/.78 "Arial Black",Impact,sans-serif;letter-spacing:-.065em;color:var(--hot);text-shadow:0 0 6px #fff,0 0 25px var(--amber),0 0 90px var(--amber);transform:skewX(-4deg)}
+    .poster::after{content:"";position:absolute;width:125vmax;height:22vmax;background:var(--amber);filter:blur(90px);opacity:.28;transform:rotate(-11deg)}
+    .webgl-settled #swarm{opacity:1}
+    .webgl-settled .poster{opacity:0;pointer-events:none}
+    .hud{position:absolute;inset:0;z-index:3;pointer-events:none;display:grid;grid-template:76px 1fr 72px / minmax(24px,6vw) 1fr minmax(24px,6vw)}
+    .topline{grid-column:1/-1;border-bottom:1px solid rgba(255,247,223,.28);display:flex;align-items:center;justify-content:space-between;padding:0 clamp(18px,3vw,48px);font:800 .72rem/1 "Courier New",monospace;letter-spacing:.11em;text-transform:uppercase}
+    .brand{font-family:"Arial Black",Impact,sans-serif;font-size:1rem;letter-spacing:-.03em;color:var(--amber)}
+    .live{display:flex;align-items:center;gap:9px}.live i{width:8px;height:8px;background:var(--teal);border-radius:50%;box-shadow:0 0 16px var(--teal)}
+    .rail{grid-row:2;grid-column:1;border-right:1px solid rgba(255,247,223,.18);display:flex;align-items:center;justify-content:center}
+    .rail span{font:700 .62rem/1 "Courier New",monospace;letter-spacing:.14em;writing-mode:vertical-rl;transform:rotate(180deg);color:rgba(255,247,223,.64)}
+    .hero-copy{grid-row:2;grid-column:2;display:flex;align-items:flex-end;justify-content:space-between;padding:0 clamp(0px,2vw,34px) clamp(42px,6vh,74px);gap:30px}
+    .hero-copy h1{max-width:12ch;margin:0;font:900 clamp(2.2rem,5.5vw,5.7rem)/.91 "Arial Black",Impact,sans-serif;letter-spacing:-.04em;text-wrap:balance;text-transform:uppercase}
+    .hero-copy h1 span{display:block;color:var(--amber)}
+    .hero-copy p{max-width:29ch;margin:0 0 .45rem;font-size:clamp(.92rem,1.2vw,1.1rem);line-height:1.45;color:rgba(255,247,223,.85)}
+    .bottomline{grid-row:3;grid-column:1/-1;border-top:1px solid rgba(255,247,223,.28);display:flex;align-items:center;justify-content:space-between;padding:0 clamp(18px,3vw,48px);font:700 .65rem/1 "Courier New",monospace;letter-spacing:.08em;text-transform:uppercase}
+    .interaction{display:flex;gap:18px}.interaction b{color:var(--teal)}
+    .scroll-cue{pointer-events:auto;text-decoration:none;display:flex;gap:9px;align-items:center}
+    .scroll-cue::after{content:"↓";color:var(--amber);font-size:1.1rem}
+    main{position:relative;z-index:2;background:var(--paper);color:var(--ink)}
+    .manifesto{min-height:88vh;display:grid;grid-template-columns:minmax(18px,1fr) minmax(0,1180px) minmax(18px,1fr);align-items:center;background:var(--amber);overflow:hidden}
+    .manifesto-inner{grid-column:2;position:relative;padding:15vh 0}
+    .manifesto h2{margin:0;max-width:10ch;font:900 clamp(3rem,9vw,8rem)/.86 "Arial Black",Impact,sans-serif;letter-spacing:-.04em;text-transform:uppercase;text-wrap:balance}
+    .manifesto h2 em{font-style:normal;color:var(--paper);text-shadow:5px 5px 0 var(--ink)}
+    .manifesto p{max-width:48ch;margin:3rem 0 0 auto;font-size:clamp(1.15rem,2vw,1.75rem);line-height:1.35;font-weight:700}
+    .manifesto .orb{position:absolute;right:-15vw;top:9vh;width:42vw;aspect-ratio:1;border:clamp(20px,5vw,70px) dotted var(--teal);border-radius:50%;opacity:.75;mix-blend-mode:multiply}
+    .capabilities{padding:clamp(90px,13vw,180px) clamp(20px,6vw,90px);background:var(--paper)}
+    .cap-head{display:grid;grid-template-columns:1fr 2fr;gap:6vw;align-items:end;margin-bottom:8vw;border-bottom:2px solid var(--ink);padding-bottom:22px}
+    .cap-head p{margin:0;font:700 .75rem/1.3 "Courier New",monospace;text-transform:uppercase;letter-spacing:.1em;color:#71300e}
+    .cap-head h2{margin:0;font:900 clamp(2.7rem,7vw,6rem)/.9 "Arial Black",Impact,sans-serif;letter-spacing:-.04em;text-transform:uppercase;text-align:right}
+    .cap-list{list-style:none;margin:0;padding:0}
+    .cap-list li{display:grid;grid-template-columns:minmax(70px,.5fr) 1.15fr 1fr;gap:4vw;align-items:baseline;border-bottom:1px solid rgba(19,8,4,.35);padding:clamp(30px,5vw,64px) 0}
+    .cap-list strong{font:900 clamp(3.8rem,8vw,8rem)/.75 "Arial Black",Impact,sans-serif;color:var(--amber);letter-spacing:-.06em}
+    .cap-list h3{margin:0;font:900 clamp(1.7rem,3.5vw,3.3rem)/.95 "Arial Black",Impact,sans-serif;text-transform:uppercase;letter-spacing:-.03em}
+    .cap-list p{margin:0;max-width:40ch;font-size:clamp(1rem,1.25vw,1.17rem);line-height:1.55}
+    .contact{min-height:82vh;background:var(--teal);color:var(--ink);display:flex;flex-direction:column;justify-content:space-between;padding:clamp(28px,5vw,74px);overflow:hidden}
+    .contact-top{display:flex;justify-content:space-between;font:800 .72rem/1 "Courier New",monospace;letter-spacing:.09em;text-transform:uppercase}
+    .contact h2{margin:auto 0 5vh;font:900 clamp(4rem,14vw,13rem)/.74 "Arial Black",Impact,sans-serif;letter-spacing:-.065em;text-transform:uppercase;max-width:8ch}
+    .contact h2 span{color:var(--paper);text-shadow:5px 5px 0 var(--ink)}
+    .contact-bottom{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;border-top:2px solid var(--ink);padding-top:24px}
+    .contact-bottom p{margin:0;max-width:41ch;font-size:clamp(1rem,1.5vw,1.25rem);line-height:1.45;font-weight:700}
+    .cta{display:inline-flex;align-items:center;justify-content:center;min-height:58px;padding:0 26px;background:var(--ink);color:var(--paper);font-weight:900;text-decoration:none;text-transform:uppercase;letter-spacing:.04em;transition:transform 140ms var(--ease),background-color 140ms var(--ease)}
+    .cta:focus-visible,.scroll-cue:focus-visible{outline:3px solid var(--paper);outline-offset:4px}
+    .noscript-note{position:absolute;z-index:5;left:50%;top:25%;transform:translateX(-50%);padding:.6rem 1rem;background:var(--teal);color:var(--ink);font-weight:900}
+    @media (hover:hover) and (pointer:fine){.cta:hover{transform:translate(-4px,-4px);background:#421704}}
+    @media (max-width:700px){
+      .hud{grid-template-rows:62px 1fr 88px;grid-template-columns:18px 1fr 18px}.rail{display:none}.hero-copy{grid-column:2;display:block;padding:0 0 32px}.hero-copy h1{max-width:9ch;text-shadow:0 2px 12px var(--ink),0 0 3px var(--ink)}.hero-copy p{margin:18px 0 0 -10px;max-width:25ch;padding:9px 10px;background:var(--ink);color:var(--hot)}.topline{padding:0 18px}.topline>span:nth-child(2){display:none}.bottomline{padding:0 18px}.interaction{display:block}.interaction span:last-child{display:none}.manifesto p{margin-left:0}.manifesto .orb{width:70vw;right:-35vw}.cap-head{grid-template-columns:1fr}.cap-head h2{text-align:left}.cap-list li{grid-template-columns:74px 1fr}.cap-list p{grid-column:2}.contact-bottom{align-items:stretch;flex-direction:column}.cta{width:100%}
+    }
+    @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.webgl-settled .poster{opacity:1}.webgl-ready #swarm{display:none}.poster::after{filter:blur(55px)}.cta{transition:opacity 140ms ease}.cta:hover{transform:none!important}}
+  </style>
+</head>
+<body>
+  <section class="hero" id="hero" aria-label="Interactive SWARM particle field">
+    <div class="poster" aria-hidden="true"></div>
+    <canvas id="swarm" aria-hidden="true"></canvas>
+    <div class="hud">
+      <div class="topline"><span class="brand">SWARM®</span><span>Collective intelligence / generative data</span><span class="live"><i></i>Field live</span></div>
+      <div class="rail"><span>131,072 active agents · one emergent form</span></div>
+      <div class="hero-copy">
+        <h1>Designing with <span>many minds.</span></h1>
+        <p>We turn complex systems into living identities, instruments and experiences people can feel.</p>
+      </div>
+      <div class="bottomline">
+        <div class="interaction"><span><b>DRAG</b> STIR / REPEL</span><span><b>SHIFT + DRAG</b> ATTRACT</span></div>
+        <a class="scroll-cue" href="#work">Enter the field</a>
+      </div>
+    </div>
+    <noscript><div class="noscript-note">Interactive field paused. The work continues below.</div></noscript>
+  </section>
+
+  <main id="work">
+    <section class="manifesto">
+      <div class="manifesto-inner">
+        <div class="orb" aria-hidden="true"></div>
+        <h2>Not artificial. <em>Collective.</em></h2>
+        <p>SWARM is a design lab for organizations sitting on too much intelligence and not enough form. We make the invisible structure visible, usable and impossible to ignore.</p>
+      </div>
+    </section>
+
+    <section class="capabilities" aria-labelledby="cap-title">
+      <header class="cap-head"><p>What the swarm does<br>From signal to system</p><h2 id="cap-title">Three ways in.</h2></header>
+      <ol class="cap-list">
+        <li><strong>A</strong><h3>Living identities</h3><p>Generative brand systems that respond to data, context and people without losing their core.</p></li>
+        <li><strong>B</strong><h3>Intelligence instruments</h3><p>Interfaces for exploring dense models and datasets through motion, spatial logic and direct manipulation.</p></li>
+        <li><strong>C</strong><h3>Emergent experiences</h3><p>Interactive installations and WebGL worlds built to make participation change what everyone sees.</p></li>
+      </ol>
+    </section>
+
+    <section class="contact" id="contact">
+      <div class="contact-top"><span>SWARM / London + everywhere</span><span>New field notes 07.26</span></div>
+      <h2>Bring us the <span>mess.</span></h2>
+      <div class="contact-bottom"><p>Have a system nobody can explain, a dataset nobody wants to touch, or a brand that should behave more like an organism?</p><a class="cta" href="mailto:field@swarm.design">Start a field study ↗</a></div>
+    </section>
+  </main>
+
+  <script>
+  (()=>{
+    'use strict';
+    const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(reduced)return;
+    requestAnimationFrame(()=>{
+    const canvas=document.getElementById('swarm');
+    const gl=canvas.getContext('webgl2',{alpha:false,antialias:false,powerPreference:'high-performance',depth:false,stencil:false,preserveDrawingBuffer:true});
+    if(!gl||!gl.getExtension('EXT_color_buffer_float'))return;
+
+    const W=512,H=256,N=W*H;
+    const vsQuad=`#version 300 es
+      const vec2 P[3]=vec2[3](vec2(-1.,-1.),vec2(3.,-1.),vec2(-1.,3.));
+      out vec2 uv;void main(){gl_Position=vec4(P[gl_VertexID],0.,1.);uv=.5*(gl_Position.xy+1.);}`;
+    const fsUpdate=`#version 300 es
+      precision highp float;precision highp sampler2D;
+      in vec2 uv;layout(location=0)out vec4 oPos;layout(location=1)out vec4 oVel;
+      uniform sampler2D uPos,uVel,uTarget;uniform float uTime,uDt,uPointerOn,uForce,uScatter;uniform vec2 uPointer,uAspect;
+      vec3 field(vec3 p){
+        float t=uTime*.22;
+        vec3 q=p*2.15+vec3(t,-t*.73,t*.41);
+        return vec3(sin(q.y*1.31)+cos(q.z*1.73),sin(q.z*1.47)+cos(q.x*1.17),sin(q.x*1.29)+cos(q.y*1.61));
+      }
+      void main(){
+        vec3 p=texture(uPos,uv).xyz,v=texture(uVel,uv).xyz,target=texture(uTarget,uv).xyz;
+        vec3 toTarget=target-p;
+        vec3 curl=field(p)+.48*field(p*1.91+4.7);
+        float far=clamp(length(toTarget)*.7,0.,1.);
+        vec3 a=toTarget*(1.15+far*2.3)+curl*(.20+uScatter*.65);
+        vec2 d=(p.xy-uPointer)*vec2(uAspect.x,1.);
+        float r=length(d),reach=exp(-r*r*6.5)*uPointerOn;
+        vec2 radial=normalize(d+vec2(.0001));
+        a.xy+=radial*reach*uForce*5.8/vec2(uAspect.x,1.);
+        a.xy+=vec2(-radial.y,radial.x)*reach*abs(uForce)*2.9/vec2(uAspect.x,1.);
+        a+=toTarget*uScatter*-.25;
+        v=(v+a*uDt)*pow(.935,uDt*60.);
+        p+=v*uDt;
+        oPos=vec4(p,1.);oVel=vec4(v,1.);
+      }`;
+    const vsParticle=`#version 300 es
+      precision highp float;precision highp sampler2D;
+      uniform sampler2D uPos;uniform vec2 uGrid;uniform float uPoint,uAspect;
+      out float depth;out float speed;
+      void main(){
+        int id=gl_VertexID;ivec2 tc=ivec2(id%int(uGrid.x),id/int(uGrid.x));
+        vec3 p=texelFetch(uPos,tc,0).xyz;depth=clamp(p.z*.5+.5,0.,1.);
+        vec2 clip=vec2(p.x/uAspect,p.y);
+        gl_Position=vec4(clip,p.z*.05,1.);gl_PointSize=uPoint*(.72+depth*.9);
+        speed=fract(float(id)*.6180339);
+      }`;
+    const fsParticle=`#version 300 es
+      precision highp float;in float depth;in float speed;out vec4 outColor;
+      void main(){
+        vec2 q=gl_PointCoord-.5;float d=length(q);if(d>.5)discard;
+        float core=smoothstep(.5,.03,d),halo=smoothstep(.5,.12,d);
+        vec3 amber=vec3(1.,.31,.035),hot=vec3(1.,.94,.72),teal=vec3(.02,.83,.72);
+        vec3 col=mix(teal,amber,smoothstep(.12,.72,depth));
+        col=mix(col,hot,pow(core,5.)*step(.82,speed));
+        outColor=vec4(col*(core*1.7+halo*.42),core*.92);
+      }`;
+    const fsBlur=`#version 300 es
+      precision highp float;in vec2 uv;out vec4 outColor;uniform sampler2D uTex;uniform vec2 uDir;
+      void main(){vec3 c=texture(uTex,uv).rgb*.227027;c+=texture(uTex,uv+uDir*1.3846).rgb*.316216;c+=texture(uTex,uv-uDir*1.3846).rgb*.316216;c+=texture(uTex,uv+uDir*3.2308).rgb*.070270;c+=texture(uTex,uv-uDir*3.2308).rgb*.070270;outColor=vec4(c,1.);}`;
+    const fsComposite=`#version 300 es
+      precision highp float;in vec2 uv;out vec4 outColor;uniform sampler2D uSharp,uBloom;uniform float uTime;
+      float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+      void main(){
+        vec3 s=texture(uSharp,uv).rgb,b=texture(uBloom,uv).rgb;
+        float bands=.018*sin(uv.y*340.+uTime*2.);
+        vec3 bg=mix(vec3(.055,.012,.002),vec3(.17,.035,.005),uv.y)+bands*vec3(.18,.04,0.);
+        bg+=vec3(.02,.09,.08)*smoothstep(.9,.0,length(uv-vec2(.72,.34)));
+        float grain=(hash(gl_FragCoord.xy+uTime)-.5)*.035;
+        outColor=vec4(bg+s+b*1.42+grain,1.);
+      }`;
+
+    function shader(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(s));return s}
+    function program(vs,fs){const p=gl.createProgram();gl.attachShader(p,shader(gl.VERTEX_SHADER,vs));gl.attachShader(p,shader(gl.FRAGMENT_SHADER,fs));gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(p));return p}
+    function tex(w,h,data,internal=gl.RGBA32F,type=gl.FLOAT,filter=gl.NEAREST){const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,filter);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,filter);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);gl.texImage2D(gl.TEXTURE_2D,0,internal,w,h,0,gl.RGBA, type,data);return t}
+    function stateFbo(pos,vel){const f=gl.createFramebuffer();gl.bindFramebuffer(gl.FRAMEBUFFER,f);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,pos,0);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT1,gl.TEXTURE_2D,vel,0);gl.drawBuffers([gl.COLOR_ATTACHMENT0,gl.COLOR_ATTACHMENT1]);if(gl.checkFramebufferStatus(gl.FRAMEBUFFER)!==gl.FRAMEBUFFER_COMPLETE)throw Error('state framebuffer incomplete');return f}
+    function screenTarget(w,h){const t=tex(w,h,null,gl.RGBA8,gl.UNSIGNED_BYTE,gl.LINEAR);const f=gl.createFramebuffer();gl.bindFramebuffer(gl.FRAMEBUFFER,f);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,t,0);return{t,f,w,h}}
+    function bindTex(p,name,t,unit){gl.activeTexture(gl.TEXTURE0+unit);gl.bindTexture(gl.TEXTURE_2D,t);gl.uniform1i(gl.getUniformLocation(p,name),unit)}
+
+    function targets(){
+      const c=document.createElement('canvas'),x=c.getContext('2d',{willReadFrequently:true});c.width=1200;c.height=340;
+      x.fillStyle='#000';x.fillRect(0,0,c.width,c.height);x.fillStyle='#fff';x.textAlign='center';x.textBaseline='middle';x.font='900 265px Arial Black, Impact, sans-serif';x.fillText('SWARM',600,174);
+      const d=x.getImageData(0,0,c.width,c.height).data,pts=[];
+      for(let y=4;y<c.height;y+=3)for(let xx=2;xx<c.width;xx+=3)if(d[(y*c.width+xx)*4]>80)pts.push([(xx/c.width*2-1)*1.36,(1-y/c.height*2)*.78]);
+      const out=new Float32Array(N*4);for(let i=0;i<N;i++){const p=pts[(Math.random()*pts.length)|0],j=i*4;out[j]=p[0]+(Math.random()-.5)*.008;out[j+1]=p[1]+(Math.random()-.5)*.008;out[j+2]=(Math.random()-.5)*.72;out[j+3]=1}return out;
+    }
+    const targetData=targets(),posData=new Float32Array(N*4),velData=new Float32Array(N*4);
+    for(let i=0;i<N;i++){const j=i*4,a=Math.random()*Math.PI*2,r=.25+Math.random()*1.5;posData[j]=Math.cos(a)*r;posData[j+1]=Math.sin(a)*r;posData[j+2]=(Math.random()-.5)*1.4;posData[j+3]=1;velData[j+3]=1}
+    const targetTex=tex(W,H,targetData);
+    const state=[0,1].map(()=>{const p=tex(W,H,posData),v=tex(W,H,velData);return{p,v,f:stateFbo(p,v)}});
+    const updateP=program(vsQuad,fsUpdate),particleP=program(vsParticle,fsParticle),blurP=program(vsQuad,fsBlur),compositeP=program(vsQuad,fsComposite);
+    const vao=gl.createVertexArray();gl.bindVertexArray(vao);
+    let scene,bloomA,bloomB,dpr=1,read=0,last=performance.now(),pointer=[0,0],pointerOn=0,force=1,scatter=0,targetScatter=0;
+    function resize(){
+      dpr=Math.min(devicePixelRatio||1,1.5);const w=Math.max(1,Math.floor(canvas.clientWidth*dpr)),h=Math.max(1,Math.floor(canvas.clientHeight*dpr));if(canvas.width===w&&canvas.height===h)return;
+      canvas.width=w;canvas.height=h;[scene,bloomA,bloomB].forEach(o=>{if(o){gl.deleteFramebuffer(o.f);gl.deleteTexture(o.t)}});scene=screenTarget(w,h);bloomA=screenTarget(Math.max(1,w>>1),Math.max(1,h>>1));bloomB=screenTarget(Math.max(1,w>>1),Math.max(1,h>>1));
+    }
+    let pending=null,scheduled=false;
+    function applyPointer(){scheduled=false;if(!pending)return;const r=canvas.getBoundingClientRect();pointer=[((pending.x-r.left)/r.width*2-1)*(r.width/r.height),1-(pending.y-r.top)/r.height*2];force=pending.shift?-1:1;pending=null}
+    canvas.addEventListener('pointermove',e=>{pending={x:e.clientX,y:e.clientY,shift:e.shiftKey};pointerOn=1;if(!scheduled){scheduled=true;requestAnimationFrame(applyPointer)}} ,{passive:true});
+    canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture(e.pointerId);force=e.shiftKey?-1:1;pointerOn=1});
+    canvas.addEventListener('pointerup',e=>{if(canvas.hasPointerCapture(e.pointerId))canvas.releasePointerCapture(e.pointerId);pointerOn=.35});
+    canvas.addEventListener('pointerleave',()=>pointerOn=0);
+    const io=new IntersectionObserver(([e])=>{targetScatter=e.intersectionRatio<.82?1:0},{threshold:[0,.2,.5,.82,1]});io.observe(document.querySelector('.hero'));
+
+    function frame(now){
+      resize();const dt=Math.min(.025,(now-last)/1000||.016);last=now;scatter+=(targetScatter-scatter)*.045;pointerOn*=.992;
+      const write=1-read,aspect=canvas.width/canvas.height;
+      gl.useProgram(updateP);gl.bindFramebuffer(gl.FRAMEBUFFER,state[write].f);gl.viewport(0,0,W,H);bindTex(updateP,'uPos',state[read].p,0);bindTex(updateP,'uVel',state[read].v,1);bindTex(updateP,'uTarget',targetTex,2);
+      gl.uniform1f(gl.getUniformLocation(updateP,'uTime'),now/1000);gl.uniform1f(gl.getUniformLocation(updateP,'uDt'),dt);gl.uniform1f(gl.getUniformLocation(updateP,'uPointerOn'),pointerOn);gl.uniform1f(gl.getUniformLocation(updateP,'uForce'),force);gl.uniform1f(gl.getUniformLocation(updateP,'uScatter'),scatter);gl.uniform2f(gl.getUniformLocation(updateP,'uPointer'),pointer[0],pointer[1]);gl.uniform2f(gl.getUniformLocation(updateP,'uAspect'),aspect,1);gl.drawArrays(gl.TRIANGLES,0,3);read=write;
+      gl.bindFramebuffer(gl.FRAMEBUFFER,scene.f);gl.viewport(0,0,scene.w,scene.h);gl.clearColor(0,0,0,1);gl.clear(gl.COLOR_BUFFER_BIT);gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE);gl.useProgram(particleP);bindTex(particleP,'uPos',state[read].p,0);gl.uniform2f(gl.getUniformLocation(particleP,'uGrid'),W,H);gl.uniform1f(gl.getUniformLocation(particleP,'uPoint'),Math.max(1.15,dpr*1.28));gl.uniform1f(gl.getUniformLocation(particleP,'uAspect'),aspect);gl.drawArrays(gl.POINTS,0,N);gl.disable(gl.BLEND);
+      gl.useProgram(blurP);gl.bindFramebuffer(gl.FRAMEBUFFER,bloomA.f);gl.viewport(0,0,bloomA.w,bloomA.h);bindTex(blurP,'uTex',scene.t,0);gl.uniform2f(gl.getUniformLocation(blurP,'uDir'),1/bloomA.w,0);gl.drawArrays(gl.TRIANGLES,0,3);
+      gl.bindFramebuffer(gl.FRAMEBUFFER,bloomB.f);bindTex(blurP,'uTex',bloomA.t,0);gl.uniform2f(gl.getUniformLocation(blurP,'uDir'),0,1/bloomA.h);gl.drawArrays(gl.TRIANGLES,0,3);
+      gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.viewport(0,0,canvas.width,canvas.height);gl.useProgram(compositeP);bindTex(compositeP,'uSharp',scene.t,0);bindTex(compositeP,'uBloom',bloomB.t,1);gl.uniform1f(gl.getUniformLocation(compositeP,'uTime'),now/1000);gl.drawArrays(gl.TRIANGLES,0,3);
+      requestAnimationFrame(frame);
+    }
+    document.documentElement.classList.add('webgl-ready');setTimeout(()=>document.documentElement.classList.add('webgl-settled'),1200);requestAnimationFrame(frame);
+    });
+  })();
+  </script>
+</body>
+</html>

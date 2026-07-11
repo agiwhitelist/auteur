@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#05060a">
+  <meta name="description" content="FLUX is a generative-technology studio building living identities, realtime worlds, and computational campaigns.">
+  <title>FLUX | Generative technology studio</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23c9ff18'/%3E%3Cpath d='M7 6h19v6H14v3h9v6h-9v5H7z'/%3E%3C/svg%3E">
+  <style>
+    @font-face { font-family: "Bowlby One SC"; src: url("assets/bowlby-one-sc.woff2") format("woff2"); font-style: normal; font-weight: 400; font-display: swap; }
+    @font-face { font-family: "IBM Plex Sans"; src: url("assets/ibm-plex-sans.woff2") format("woff2"); font-style: normal; font-weight: 400 600; font-display: swap; }
+    :root {
+      --ink: #05050a;
+      --plasma-black: #05060a;
+      --paper: #f4f2ed;
+      --lime: #c9ff18;
+      --cyan: #00e5ff;
+      --pink: #ff145b;
+      --line: rgba(5,5,10,.22);
+      --display: "Bowlby One SC", Impact, sans-serif;
+      --text: "IBM Plex Sans", Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: var(--ink); }
+    body { margin: 0; color: var(--ink); background: var(--lime); font-family: var(--text); }
+    a { color: inherit; }
+    a:focus-visible, button:focus-visible { outline: 3px solid var(--cyan); outline-offset: 5px; }
+    .skip { position: fixed; z-index: 20; top: 1rem; left: 1rem; padding: .7rem 1rem; background: var(--paper); transform: translateY(-180%); }
+    .skip:focus { transform: translateY(0); }
+
+    .hero { position: relative; height: 100svh; min-height: 38rem; overflow: hidden; isolation: isolate; color: white; background: var(--plasma-black); }
+    .hero::before { content: ""; position: absolute; inset: -20%; z-index: 0; background: radial-gradient(circle at 18% 32%, #ff2d95 0 8%, transparent 32%), radial-gradient(circle at 77% 62%, #12e0ff 0 8%, transparent 33%), var(--plasma-black); filter: saturate(1.4); transform: rotate(-7deg) scale(1.18); }
+    .hero::after { content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none; opacity: .16; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.48'/%3E%3C/svg%3E"); mix-blend-mode: overlay; }
+    #fluid { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; visibility: hidden; touch-action: none; cursor: crosshair; }
+    .webgl-ready #fluid { visibility: visible; }
+    .hero-nav { position: absolute; z-index: 4; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: clamp(1rem,2vw,2rem); font-size: .76rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+    .hero-nav a { text-decoration: none; }
+    .mark { font-family: var(--display); font-size: 1.25rem; letter-spacing: -.03em; }
+    .status { display: flex; gap: .7rem; align-items: center; }
+    .status::before { content: ""; width: .58rem; height: .58rem; border-radius: 50%; background: var(--lime); box-shadow: 0 0 18px var(--lime); }
+    .fallback-word { position: absolute; z-index: 1; top: 50%; left: 50%; width: 100%; margin: 0; color: white; font-family: var(--display); font-size: clamp(6rem, 24vw, 22rem); line-height: .78; text-align: center; letter-spacing: -.04em; transform: translate(-50%,-50%) scaleX(1.06); text-shadow: 0 0 60px rgba(255,20,91,.72); }
+    .webgl-ready .fallback-word { opacity: 0; }
+    .hero-copy { position: absolute; z-index: 4; left: clamp(1rem,2vw,2rem); right: clamp(1rem,2vw,2rem); bottom: clamp(1.2rem,3vw,2.8rem); display: grid; grid-template-columns: minmax(0,1fr) minmax(16rem,27rem); gap: 2rem; align-items: end; pointer-events: none; }
+    .hero-copy p { max-width: 31rem; margin: 0; font-size: clamp(1rem,1.45vw,1.28rem); line-height: 1.42; text-wrap: pretty; text-shadow: 0 2px 20px #000; }
+    .instruction { justify-self: end; display: flex; align-items: center; gap: .8rem; font-size: .72rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; text-shadow: 0 2px 12px #000; }
+    .instruction::before { content: "↗"; display: grid; width: 2.7rem; height: 2.7rem; place-items: center; border: 1px solid rgba(255,255,255,.72); border-radius: 50%; font-size: 1.2rem; }
+
+    main { overflow: clip; }
+    .manifesto { min-height: 100svh; padding: clamp(5rem,11vw,10rem) clamp(1rem,4vw,4rem); display: grid; grid-template-columns: minmax(9rem,1fr) minmax(18rem,2.25fr); gap: clamp(2rem,7vw,8rem); align-items: start; background: var(--lime); }
+    .manifesto h2 { margin: 0; font-family: var(--display); font-size: clamp(4rem,10vw,9rem); line-height: .83; letter-spacing: -.04em; text-transform: uppercase; transform: rotate(-2deg); }
+    .manifesto-copy { padding-top: clamp(8rem,18vw,17rem); }
+    .manifesto-copy p { max-width: 23ch; margin: 0; font-size: clamp(1.8rem,4.5vw,4.7rem); line-height: .96; font-weight: 500; letter-spacing: -.035em; text-wrap: balance; }
+    .manifesto-copy small { display: block; max-width: 48ch; margin-top: 3rem; font-size: 1rem; line-height: 1.55; }
+
+    .capabilities { background: var(--paper); padding: clamp(5rem,8vw,8rem) clamp(1rem,4vw,4rem); }
+    .capabilities > h2 { max-width: 12ch; margin: 0 0 4rem; font-family: var(--display); font-size: clamp(3rem,7vw,6rem); line-height: .88; letter-spacing: -.04em; text-transform: uppercase; }
+    .capability { display: grid; grid-template-columns: 1.1fr 1.8fr auto; gap: clamp(1.2rem,4vw,5rem); align-items: baseline; padding: clamp(2rem,4vw,4rem) 0; border-top: 2px solid var(--ink); }
+    .capability:last-child { border-bottom: 2px solid var(--ink); }
+    .capability h3 { margin: 0; font-family: var(--display); font-size: clamp(1.8rem,4.2vw,4rem); line-height: .9; letter-spacing: -.03em; text-transform: uppercase; }
+    .capability p { max-width: 58ch; margin: 0; font-size: clamp(1rem,1.4vw,1.25rem); line-height: 1.5; }
+    .capability strong { font-size: clamp(3rem,7vw,7rem); line-height: .7; color: var(--pink); }
+    .capability:nth-of-type(3) strong { color: #008da0; }
+    .capability:nth-of-type(4) strong { color: #587500; }
+
+    .method { min-height: 78svh; display: grid; grid-template-columns: 1.4fr 1fr; background: var(--pink); color: white; }
+    .method h2 { margin: 0; padding: clamp(4rem,8vw,8rem) clamp(1rem,4vw,4rem); font-family: var(--display); font-size: clamp(4rem,10vw,10rem); line-height: .79; letter-spacing: -.04em; text-transform: uppercase; align-self: end; }
+    .method div { display: flex; flex-direction: column; justify-content: space-between; padding: clamp(4rem,8vw,8rem) clamp(1rem,4vw,4rem); color: var(--ink); border-left: 2px solid rgba(255,255,255,.65); }
+    .method p { max-width: 29ch; margin: 0; font-size: clamp(1.35rem,2.5vw,2.3rem); line-height: 1.1; }
+    .method code { font-family: var(--text); font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; }
+
+    .contact { min-height: 92svh; display: flex; flex-direction: column; justify-content: space-between; padding: clamp(1rem,4vw,4rem); background: var(--cyan); }
+    .contact p { max-width: 35ch; margin: 0; font-size: clamp(1.1rem,2vw,1.7rem); line-height: 1.35; }
+    .contact a { display: inline-block; align-self: flex-start; font-family: var(--display); font-size: clamp(4.2rem,16vw,15rem); line-height: .82; letter-spacing: -.04em; text-decoration-thickness: .055em; text-underline-offset: .08em; text-transform: uppercase; transition: transform 150ms ease-out; }
+    .contact a:hover { transform: translateX(.04em); }
+    footer { display: flex; justify-content: space-between; gap: 1rem; padding-top: 4rem; font-size: .75rem; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+    @media (max-width: 720px) {
+      .hero-copy { grid-template-columns: 1fr; }
+      .instruction { justify-self: start; }
+      .manifesto { grid-template-columns: 1fr; min-height: auto; }
+      .manifesto-copy { padding-top: 3rem; }
+      .capability { grid-template-columns: 1fr auto; }
+      .capability p { grid-column: 1 / -1; }
+      .method { grid-template-columns: 1fr; }
+      .method div { min-height: 24rem; border-top: 2px solid rgba(255,255,255,.65); border-left: 0; }
+      footer { flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .contact a { transition-duration: 0.01ms; }
+      .instruction { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#work">Skip to studio information</a>
+  <header class="hero" id="top">
+    <canvas id="fluid" aria-hidden="true"></canvas>
+    <nav class="hero-nav" aria-label="Primary">
+      <a class="mark" href="#top">Flux</a>
+      <span class="status">System reactive</span>
+      <a href="#contact">Start a signal</a>
+    </nav>
+    <h1 class="sr-only">FLUX generative technology studio</h1>
+    <p class="fallback-word" aria-hidden="true">FLUX</p>
+    <div class="hero-copy">
+      <p>We build identities that refuse to hold still. Realtime systems, generative campaigns, and digital matter shaped by human input.</p>
+      <span class="instruction">Move fast. Stir the signal.</span>
+    </div>
+    <noscript><style>#fluid{display:none}</style></noscript>
+  </header>
+
+  <main id="work">
+    <section class="manifesto">
+      <h2>Code<br>with a<br>pulse.</h2>
+      <div class="manifesto-copy">
+        <p>We turn rules into behavior, then hand the controls to the audience.</p>
+        <small>FLUX is an independent creative-code studio working where identity, interaction, and computation collide. Every system is built to react, mutate, and remain unmistakably yours.</small>
+      </div>
+    </section>
+
+    <section class="capabilities" aria-labelledby="capabilities-title">
+      <h2 id="capabilities-title">Three ways we make matter move</h2>
+      <article class="capability">
+        <h3>Living identities</h3>
+        <p>Brand systems with rules, range, and a memory. Marks respond to sound, people, place, data, and time without losing their voice.</p>
+        <strong aria-hidden="true">↯</strong>
+      </article>
+      <article class="capability">
+        <h3>Realtime worlds</h3>
+        <p>WebGL experiences and interactive installations that feel physical. Fast, tactile, and tuned for the devices people actually use.</p>
+        <strong aria-hidden="true">◎</strong>
+      </article>
+      <article class="capability">
+        <h3>Generative campaigns</h3>
+        <p>Systems that produce thousands of distinct outputs from one coherent idea, with human art direction locked into the machinery.</p>
+        <strong aria-hidden="true">✣</strong>
+      </article>
+    </section>
+
+    <section class="method">
+      <h2>Not content.<br>Behavior.</h2>
+      <div>
+        <p>We prototype with the real physics, data, and constraints from day one. The final piece is not a video of an idea. It is the idea, alive.</p>
+        <code>Signal → system → sensation</code>
+      </div>
+    </section>
+
+    <section class="contact" id="contact">
+      <p>Have a launch, identity, space, or screen that should react to the world?</p>
+      <a href="mailto:signal@flux.studio">Make it move</a>
+      <footer><span>FLUX / Generative technology studio</span><span>New York · London · The network</span><span>© 2026</span></footer>
+    </section>
+  </main>
+
+  <script>
+  (() => {
+    'use strict';
+    const canvas = document.getElementById('fluid');
+    const gl = canvas.getContext('webgl2', { alpha: false, antialias: false, depth: false, stencil: false, preserveDrawingBuffer: false });
+    if (!gl || !gl.getExtension('EXT_color_buffer_float')) return;
+
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); document.documentElement.classList.remove('webgl-ready'); }, {passive:false});
+    const linear = !!gl.getExtension('OES_texture_float_linear');
+    const vertex = `#version 300 es
+      precision highp float;
+      out vec2 vUv;
+      void main(){
+        vec2 p=vec2((gl_VertexID<<1)&2,gl_VertexID&2);
+        vUv=p;
+        gl_Position=vec4(p*2.0-1.0,0.0,1.0);
+      }`;
+    const header = `#version 300 es
+      precision highp float;
+      precision highp sampler2D;
+      in vec2 vUv;
+      out vec4 outColor;
+    `;
+    const shaders = {
+      splat: header + `uniform sampler2D uTarget; uniform vec2 uPoint; uniform vec3 uValue; uniform float uRadius; uniform float uAspect;
+        void main(){vec2 p=vUv-uPoint;p.x*=uAspect;vec3 base=texture(uTarget,vUv).xyz;float s=exp(-dot(p,p)/uRadius);outColor=vec4(base+uValue*s,1.0);}`,
+      advection: header + `uniform sampler2D uVelocity,uSource; uniform vec2 uTexel; uniform float uDt,uDissipation; uniform bool uManual;
+        vec4 bilerp(sampler2D sam,vec2 uv){vec2 st=uv/uTexel-.5;vec2 i=floor(st);vec2 f=fract(st);vec2 a=(i+.5)*uTexel;return mix(mix(texture(sam,a),texture(sam,a+vec2(uTexel.x,0)),f.x),mix(texture(sam,a+vec2(0,uTexel.y)),texture(sam,a+uTexel),f.x),f.y);}
+        void main(){vec2 vel=texture(uVelocity,vUv).xy;vec2 uv=vUv-uDt*vel*uTexel;outColor=(uManual?bilerp(uSource,uv):texture(uSource,uv))*uDissipation;}`,
+      curl: header + `uniform sampler2D uVelocity; uniform vec2 uTexel;
+        void main(){float l=texture(uVelocity,vUv-vec2(uTexel.x,0)).y;float r=texture(uVelocity,vUv+vec2(uTexel.x,0)).y;float b=texture(uVelocity,vUv-vec2(0,uTexel.y)).x;float t=texture(uVelocity,vUv+vec2(0,uTexel.y)).x;outColor=vec4(.5*(r-l-b+t),0,0,1);}`,
+      vorticity: header + `uniform sampler2D uVelocity,uCurl; uniform vec2 uTexel; uniform float uDt,uStrength;
+        void main(){float l=abs(texture(uCurl,vUv-vec2(uTexel.x,0)).x);float r=abs(texture(uCurl,vUv+vec2(uTexel.x,0)).x);float b=abs(texture(uCurl,vUv-vec2(0,uTexel.y)).x);float t=abs(texture(uCurl,vUv+vec2(0,uTexel.y)).x);float c=texture(uCurl,vUv).x;vec2 f=.5*vec2(t-b,r-l);f/=length(f)+.0001;f*=uStrength*c;f.y*=-1.0;outColor=vec4(texture(uVelocity,vUv).xy+f*uDt,0,1);}`,
+      divergence: header + `uniform sampler2D uVelocity; uniform vec2 uTexel;
+        void main(){vec2 l=texture(uVelocity,vUv-vec2(uTexel.x,0)).xy;vec2 r=texture(uVelocity,vUv+vec2(uTexel.x,0)).xy;vec2 b=texture(uVelocity,vUv-vec2(0,uTexel.y)).xy;vec2 t=texture(uVelocity,vUv+vec2(0,uTexel.y)).xy;float d=.5*(r.x-l.x+t.y-b.y);outColor=vec4(d,0,0,1);}`,
+      pressure: header + `uniform sampler2D uPressure,uDivergence; uniform vec2 uTexel;
+        void main(){float l=texture(uPressure,vUv-vec2(uTexel.x,0)).x;float r=texture(uPressure,vUv+vec2(uTexel.x,0)).x;float b=texture(uPressure,vUv-vec2(0,uTexel.y)).x;float t=texture(uPressure,vUv+vec2(0,uTexel.y)).x;float d=texture(uDivergence,vUv).x;outColor=vec4((l+r+b+t-d)*.25,0,0,1);}`,
+      gradient: header + `uniform sampler2D uPressure,uVelocity; uniform vec2 uTexel;
+        void main(){float l=texture(uPressure,vUv-vec2(uTexel.x,0)).x;float r=texture(uPressure,vUv+vec2(uTexel.x,0)).x;float b=texture(uPressure,vUv-vec2(0,uTexel.y)).x;float t=texture(uPressure,vUv+vec2(0,uTexel.y)).x;vec2 v=texture(uVelocity,vUv).xy-.5*vec2(r-l,t-b);outColor=vec4(v,0,1);}`,
+      clear: header + `uniform sampler2D uTexture; uniform float uValue; void main(){outColor=texture(uTexture,vUv)*uValue;}`,
+      display: header + `uniform sampler2D uDye,uVelocity,uWord; uniform vec2 uWordTexel; uniform float uTime;
+        void main(){vec2 vel=texture(uVelocity,vUv).xy;vec2 warped=vUv-vel*.0022;vec3 dye=texture(uDye,warped).rgb;float energy=max(dye.r,max(dye.g,dye.b));float cyanMix=smoothstep(.28,.72,vUv.x+clamp(vel.x*.00035,-.18,.18));vec3 tone=mix(vec3(1,.176,.584),vec3(.071,.878,1),cyanMix);vec3 plasma=energy*tone;float collision=smoothstep(.18,.8,min(dye.r,dye.g));plasma=mix(plasma,vec3(energy),collision*.72);float m=texture(uWord,vUv-vel*.0013).r;float e=0.0;e+=abs(m-texture(uWord,vUv+vec2(uWordTexel.x,0)).r);e+=abs(m-texture(uWord,vUv+vec2(0,uWordTexel.y)).r);vec3 inside=plasma*(1.15+m*1.9)+m*tone*.012;vec3 edge=e*tone*1.08;float vignette=1.0-.42*dot(vUv-.5,vUv-.5);outColor=vec4((inside+edge)*vignette,1);}`,
+      bright: header + `uniform sampler2D uScene; uniform float uThreshold;
+        void main(){vec3 color=texture(uScene,vUv).rgb;float peak=max(color.r,max(color.g,color.b));float gate=smoothstep(uThreshold,uThreshold+.75,peak);outColor=vec4(color*gate,1);}`,
+      blur: header + `uniform sampler2D uTexture; uniform vec2 uDirection;
+        void main(){vec3 color=texture(uTexture,vUv).rgb*.227027;color+=(texture(uTexture,vUv+uDirection*1.384615).rgb+texture(uTexture,vUv-uDirection*1.384615).rgb)*.316216;color+=(texture(uTexture,vUv+uDirection*3.230769).rgb+texture(uTexture,vUv-uDirection*3.230769).rgb)*.070270;outColor=vec4(color,1);}`,
+      composite: header + `uniform sampler2D uScene,uBloom; uniform float uBloomStrength;
+        void main(){vec3 scene=texture(uScene,vUv).rgb;vec3 bloom=texture(uBloom,vUv).rgb;vec3 color=scene+bloom*uBloomStrength+vec3(.0196,.0235,.0392);color=1.0-exp(-color*.92);color=pow(color,vec3(.86));outColor=vec4(color,1);}`
+    };
+
+    const compile = (type, source) => { const s=gl.createShader(type); gl.shaderSource(s,source); gl.compileShader(s); if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; };
+    const programs = {};
+    for (const [name, frag] of Object.entries(shaders)) {
+      const p=gl.createProgram(); gl.attachShader(p,compile(gl.VERTEX_SHADER,vertex)); gl.attachShader(p,compile(gl.FRAGMENT_SHADER,frag)); gl.linkProgram(p);
+      if(!gl.getProgramParameter(p,gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
+      programs[name]={ p, u:Object.fromEntries([...Array(gl.getProgramParameter(p,gl.ACTIVE_UNIFORMS))].map((_,i)=>{const n=gl.getActiveUniform(p,i).name;return [n,gl.getUniformLocation(p,n)];})) };
+    }
+    gl.bindVertexArray(gl.createVertexArray());
+    gl.disable(gl.BLEND);
+
+    const use = name => { const x=programs[name]; gl.useProgram(x.p); return x.u; };
+    const tex = (unit, texture, location) => { gl.activeTexture(gl.TEXTURE0+unit); gl.bindTexture(gl.TEXTURE_2D,texture); gl.uniform1i(location,unit); };
+    const target = (w,h,filter=gl.NEAREST) => {
+      const texture=gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D,texture); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,filter); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,filter); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE); gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA16F,w,h,0,gl.RGBA,gl.HALF_FLOAT,null);
+      const fbo=gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER,fbo); gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,texture,0); gl.viewport(0,0,w,h); gl.clear(gl.COLOR_BUFFER_BIT); return {texture,fbo,w,h};
+    };
+    const pair = (w,h,filter) => { const a=target(w,h,filter),b=target(w,h,filter); return {read:a,write:b,swap(){[this.read,this.write]=[this.write,this.read];}}; };
+    const destroy = f => { if(!f)return; const list=f.read?[f.read,f.write]:[f]; for(const x of list){gl.deleteTexture(x.texture);gl.deleteFramebuffer(x.fbo);} };
+    const blit = t => { gl.bindFramebuffer(gl.FRAMEBUFFER,t?t.fbo:null); gl.viewport(0,0,t?t.w:canvas.width,t?t.h:canvas.height); gl.drawArrays(gl.TRIANGLES,0,3); };
+    let velocity,dye,pressure,divergence,curl,scene,bloom,wordTexture,wordSize=[1,1];
+
+    function makeWord(){
+      const c=document.createElement('canvas'); c.width=2048; c.height=Math.max(512,Math.round(c.width/(canvas.width/canvas.height))); const x=c.getContext('2d'); x.fillStyle='#000'; x.fillRect(0,0,c.width,c.height); x.fillStyle='#fff'; x.textAlign='center'; x.textBaseline='middle'; let size=c.height*.64; x.font=`${size}px "Bowlby One SC", Impact`; const measure=x.measureText('FLUX').width; size*=Math.min(1,(c.width*.92)/measure); x.font=`${size}px "Bowlby One SC", Impact`; x.fillText('FLUX',c.width/2,c.height/2+size*.055);
+      if(!wordTexture) wordTexture=gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D,wordTexture); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true); gl.texImage2D(gl.TEXTURE_2D,0,gl.R8,gl.RED,gl.UNSIGNED_BYTE,c); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false); wordSize=[c.width,c.height];
+    }
+    function resize(){
+      const dpr=Math.min(devicePixelRatio,1.5); const w=Math.max(2,Math.round(canvas.clientWidth*dpr)); const h=Math.max(2,Math.round(canvas.clientHeight*dpr)); if(canvas.width===w&&canvas.height===h)return false; canvas.width=w;canvas.height=h;
+      [velocity,dye,pressure,divergence,curl,scene,bloom].forEach(destroy); const aspect=w/h; const simH=128,simW=Math.round(simH*aspect),dyeH=Math.min(512,Math.round(h*.62)),dyeW=Math.round(dyeH*aspect),bloomH=Math.max(2,Math.round(h*.25)),bloomW=Math.max(2,Math.round(w*.25)); const filter=linear?gl.LINEAR:gl.NEAREST;
+      velocity=pair(simW,simH,filter); dye=pair(dyeW,dyeH,filter); pressure=pair(simW,simH,gl.NEAREST); divergence=target(simW,simH); curl=target(simW,simH); scene=target(dyeW,dyeH,filter); bloom=pair(bloomW,bloomH,filter); makeWord(); seed(); return true;
+    }
+
+    const splats=[];
+    const HDR=2.6,MAGENTA=[0xff,0x2d,0x95].map(v=>v/255*HDR),CYAN=[0x12,0xe0,0xff].map(v=>v/255*HDR),MAGENTA_SEED=MAGENTA.map(v=>v*.1),CYAN_SEED=CYAN.map(v=>v*.1);
+    function queueSplat(x,y,dx,dy,color=Math.abs(dx)>=Math.abs(dy)?CYAN:MAGENTA) { splats.push({x,y,dx,dy,color}); }
+    function seed(){ for(let i=0;i<8;i++){const a=i*2.399,r=.1+.31*Math.sqrt(i/8),x=.5+Math.cos(a)*r;queueSplat(x,.5+Math.sin(a)*r,Math.cos(a+1.57)*420,Math.sin(a+1.57)*420,x<.5?MAGENTA_SEED:CYAN_SEED);} }
+    function splat(field,x,y,value,radius){ const u=use('splat'); tex(0,field.read.texture,u.uTarget); gl.uniform2f(u.uPoint,x,y);gl.uniform3fv(u.uValue,value);gl.uniform1f(u.uRadius,radius);gl.uniform1f(u.uAspect,canvas.width/canvas.height);blit(field.write);field.swap(); }
+    function applySplats(){ while(splats.length){const s=splats.shift();splat(velocity,s.x,s.y,[s.dx,s.dy,0],.00035);splat(dye,s.x,s.y,s.color,.0012);} }
+    function step(dt){
+      let u=use('advection');tex(0,velocity.read.texture,u.uVelocity);tex(1,velocity.read.texture,u.uSource);gl.uniform2f(u.uTexel,1/velocity.read.w,1/velocity.read.h);gl.uniform1f(u.uDt,dt);gl.uniform1f(u.uDissipation,.985);gl.uniform1i(u.uManual,!linear);blit(velocity.write);velocity.swap();
+      u=use('curl');tex(0,velocity.read.texture,u.uVelocity);gl.uniform2f(u.uTexel,1/velocity.read.w,1/velocity.read.h);blit(curl);
+      u=use('vorticity');tex(0,velocity.read.texture,u.uVelocity);tex(1,curl.texture,u.uCurl);gl.uniform2f(u.uTexel,1/velocity.read.w,1/velocity.read.h);gl.uniform1f(u.uDt,dt);gl.uniform1f(u.uStrength,36);blit(velocity.write);velocity.swap();
+      u=use('divergence');tex(0,velocity.read.texture,u.uVelocity);gl.uniform2f(u.uTexel,1/velocity.read.w,1/velocity.read.h);blit(divergence);
+      u=use('clear');tex(0,pressure.read.texture,u.uTexture);gl.uniform1f(u.uValue,.82);blit(pressure.write);pressure.swap();
+      u=use('pressure');gl.uniform2f(u.uTexel,1/pressure.read.w,1/pressure.read.h);tex(1,divergence.texture,u.uDivergence);for(let i=0;i<12;i++){tex(0,pressure.read.texture,u.uPressure);blit(pressure.write);pressure.swap();}
+      u=use('gradient');tex(0,pressure.read.texture,u.uPressure);tex(1,velocity.read.texture,u.uVelocity);gl.uniform2f(u.uTexel,1/velocity.read.w,1/velocity.read.h);blit(velocity.write);velocity.swap();
+      u=use('advection');tex(0,velocity.read.texture,u.uVelocity);tex(1,dye.read.texture,u.uSource);gl.uniform2f(u.uTexel,1/velocity.read.w,1/velocity.read.h);gl.uniform1f(u.uDt,dt);gl.uniform1f(u.uDissipation,.990);gl.uniform1i(u.uManual,!linear);blit(dye.write);dye.swap();
+    }
+    function render(time=0){
+      let u=use('display');tex(0,dye.read.texture,u.uDye);tex(1,velocity.read.texture,u.uVelocity);tex(2,wordTexture,u.uWord);gl.uniform2f(u.uWordTexel,1/wordSize[0],1/wordSize[1]);gl.uniform1f(u.uTime,time);blit(scene);
+      u=use('bright');tex(0,scene.texture,u.uScene);gl.uniform1f(u.uThreshold,.82);blit(bloom.write);bloom.swap();
+      u=use('blur');tex(0,bloom.read.texture,u.uTexture);gl.uniform2f(u.uDirection,1/bloom.read.w,0);blit(bloom.write);bloom.swap();
+      tex(0,bloom.read.texture,u.uTexture);gl.uniform2f(u.uDirection,0,1/bloom.read.h);blit(bloom.write);bloom.swap();
+      u=use('composite');tex(0,scene.texture,u.uScene);tex(1,bloom.read.texture,u.uBloom);gl.uniform1f(u.uBloomStrength,1.2);blit(null);
+    }
+    function present(){ const pixel=new Uint8Array(4);gl.readPixels(2,2,1,1,gl.RGBA,gl.UNSIGNED_BYTE,pixel);const white=pixel[0]>245&&pixel[1]>245&&pixel[2]>245;let energy=0;for(const x of [.2,.35,.5,.65,.8]){gl.readPixels(canvas.width*x|0,canvas.height>>1,1,1,gl.RGBA,gl.UNSIGNED_BYTE,pixel);energy=Math.max(energy,pixel[0]+pixel[1]+pixel[2]);}document.documentElement.classList.toggle('webgl-ready',!white&&energy>20); }
+
+    let lastPointer=null,latestPointer=null,pointerQueued=false;
+    canvas.addEventListener('pointermove', e => { latestPointer=e; if(pointerQueued)return; pointerQueued=true; requestAnimationFrame(()=>{pointerQueued=false;const r=canvas.getBoundingClientRect(),x=(latestPointer.clientX-r.left)/r.width,y=1-(latestPointer.clientY-r.top)/r.height;let dx=0,dy=0;if(lastPointer){dx=(latestPointer.clientX-lastPointer.x)*11;dy=(lastPointer.y-latestPointer.clientY)*11;}lastPointer={x:latestPointer.clientX,y:latestPointer.clientY};queueSplat(x,y,dx,dy);}); }, {passive:true});
+    canvas.addEventListener('pointerdown',e=>{lastPointer=null;canvas.setPointerCapture?.(e.pointerId);});
+    canvas.addEventListener('pointerleave',()=>{lastPointer=null;});
+
+    let active=true,frame=0,healthFrame=0,last=performance.now(),autoAt=last+900;
+    const observer=new IntersectionObserver(([e])=>{active=e.isIntersecting;if(active&&!reduceMotion){last=performance.now();cancelAnimationFrame(frame);frame=requestAnimationFrame(loop);}}, {threshold:.01}); observer.observe(canvas);
+    function loop(now){ if(!active)return; if(resize()) last=now; const dt=Math.min(.022,Math.max(.008,(now-last)/1000));last=now;if(now>autoAt&&performance.now()-autoAt<1600){const a=now*.0017;queueSplat(.5+Math.cos(a)*.28,.5+Math.sin(a*1.3)*.2,Math.sin(a)*210,Math.cos(a)*210);autoAt=now+1400;}applySplats();step(dt);render(now*.001);if(!document.documentElement.classList.contains('webgl-ready')||healthFrame++%60===0)present();frame=requestAnimationFrame(loop); }
+    function still(){ resize();applySplats();for(let i=0;i<28;i++)step(1/60);render(0);present(); }
+    addEventListener('resize',()=>{ if(reduceMotion) still(); },{passive:true});
+    document.fonts?.ready.then(()=>{makeWord();if(reduceMotion)still();});
+    if(reduceMotion) still(); else frame=requestAnimationFrame(loop);
+    addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(frame);}else if(active&&!reduceMotion){last=performance.now();frame=requestAnimationFrame(loop);}});
+  })();
+  </script>
+</body>
+</html>

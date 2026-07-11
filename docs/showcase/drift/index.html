@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#03151b">
+  <meta name="description" content="DRIFT builds spatial worlds, real-time environments, and embodied stories.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2303151b'/%3E%3Cpath d='M7 6h8c7 0 10 4 10 10s-3 10-10 10H7V6zm6 5v10h2c3 0 4-2 4-5s-1-5-4-5h-2z' fill='%2348e7ff'/%3E%3C/svg%3E">
+  <title>DRIFT | Immersive worlds</title>
+  <style>
+    :root {
+      --void: #03151b;
+      --deep: #062b35;
+      --cyan: #48e7ff;
+      --cyan-soft: #b5f7ff;
+      --orange: #ff5b1a;
+      --white: #f1fdff;
+      --muted: #b6dce1;
+      --edge: rgba(72, 231, 255, .28);
+      --ease-out: cubic-bezier(.23, 1, .32, 1);
+      --pad: clamp(1.25rem, 3.8vw, 4.5rem);
+    }
+
+    * { box-sizing: border-box; }
+    html { background: var(--void); color: var(--white); scroll-behavior: auto; }
+    body {
+      margin: 0;
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at 76% 24%, rgba(255, 91, 26, .22), transparent 19rem),
+        radial-gradient(circle at 50% 42%, #0a5060, var(--void) 66%);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 8;
+      pointer-events: none;
+      opacity: .055;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E");
+    }
+    a { color: inherit; }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--orange); outline-offset: 6px; }
+
+    #world {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      display: block;
+    }
+    .fallback-world {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background:
+        radial-gradient(circle at 72% 38%, rgba(255, 91, 26, .78) 0 .3rem, rgba(255, 91, 26, .25) 1.2rem, transparent 16rem),
+        repeating-linear-gradient(76deg, transparent 0 7vw, rgba(72, 231, 255, .12) 7.1vw 7.35vw, transparent 7.5vw 13vw),
+        linear-gradient(160deg, #0c6170, #03151b 70%);
+    }
+
+    .nav {
+      position: fixed;
+      z-index: 20;
+      top: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.15rem var(--pad);
+      pointer-events: none;
+    }
+    .nav a { pointer-events: auto; text-decoration: none; }
+    .brand {
+      font-family: "Arial Black", Arial, sans-serif;
+      font-size: .95rem;
+      letter-spacing: .18em;
+    }
+    .nav__contact {
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: .6rem 0;
+      border-bottom: 1px solid currentColor;
+    }
+    .hud {
+      position: fixed;
+      z-index: 20;
+      right: var(--pad);
+      bottom: 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      color: var(--cyan-soft);
+      font: 700 .65rem/1 Arial, sans-serif;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+    .hud__line { width: 4.5rem; height: 1px; background: rgba(181, 247, 255, .35); overflow: hidden; }
+    .hud__fill { display: block; width: 100%; height: 100%; background: var(--orange); transform: scaleX(0); transform-origin: left; }
+
+    main { position: relative; z-index: 4; }
+    .scene {
+      min-height: 115vh;
+      position: relative;
+      display: grid;
+      align-items: center;
+      padding: 14vh var(--pad) 10vh;
+      isolation: isolate;
+    }
+    .scene__copy { max-width: 72ch; }
+    .hero { min-height: 125vh; align-items: end; padding-bottom: 17vh; }
+    .hero__title {
+      margin: 0 0 .8rem;
+      max-width: 10ch;
+      font-family: "Arial Black", Arial, sans-serif;
+      font-size: clamp(3.8rem, 8vw, 6rem);
+      line-height: .78;
+      letter-spacing: -.04em;
+      text-wrap: balance;
+      text-transform: uppercase;
+      text-shadow: 0 0 45px rgba(0, 198, 230, .2);
+    }
+    .hero__sub {
+      width: min(34rem, 84vw);
+      margin: 1.6rem 0 0;
+      color: var(--cyan-soft);
+      font-size: clamp(1rem, 1.6vw, 1.35rem);
+    }
+    .hero__cue {
+      position: absolute;
+      right: var(--pad);
+      bottom: 17vh;
+      display: grid;
+      gap: .65rem;
+      justify-items: end;
+      font-size: .67rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--cyan-soft);
+    }
+    .hero__cue i { width: 1px; height: 5.4rem; display: block; background: linear-gradient(var(--orange), transparent); }
+
+    .beyond { justify-items: end; text-align: right; }
+    .beyond .scene__copy { width: min(48rem, 88vw); }
+    .scene h2 {
+      margin: 0;
+      font-family: "Arial Black", Arial, sans-serif;
+      font-size: clamp(3rem, 8vw, 6rem);
+      line-height: .9;
+      letter-spacing: -.04em;
+      text-transform: uppercase;
+      text-wrap: balance;
+    }
+    .scene p { color: var(--muted); font-size: clamp(1rem, 1.6vw, 1.25rem); text-wrap: pretty; }
+    .beyond p { margin: 2rem 0 0 auto; max-width: 42ch; }
+
+    .peak { min-height: 150vh; place-items: center; text-align: center; }
+    .peak::before {
+      content: "";
+      position: absolute;
+      width: min(60vw, 48rem);
+      aspect-ratio: 1;
+      border: 1px solid rgba(255, 91, 26, .38);
+      border-radius: 50%;
+      box-shadow: 0 0 100px rgba(255, 91, 26, .12), inset 0 0 70px rgba(255, 91, 26, .08);
+      pointer-events: none;
+    }
+    .peak h2 { color: var(--white); max-width: 10ch; font-size: clamp(4rem, 8vw, 6rem); }
+    .peak p { max-width: 38ch; margin: 2rem auto 0; color: var(--cyan-soft); }
+
+    .capabilities { min-height: 165vh; align-content: center; }
+    .capabilities::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: linear-gradient(90deg, rgba(3, 21, 27, .88), rgba(3, 21, 27, .5) 58%, rgba(3, 21, 27, .12));
+      pointer-events: none;
+    }
+    .capabilities__intro { max-width: 41rem; margin-bottom: clamp(4rem, 10vh, 8rem); }
+    .capabilities__intro h2 { max-width: 9ch; }
+    .cap-list { display: grid; gap: 0; max-width: 76rem; margin: 0 auto; }
+    .cap {
+      display: grid;
+      grid-template-columns: minmax(7rem, .45fr) minmax(13rem, 1fr) minmax(16rem, 1.25fr);
+      gap: 2rem;
+      align-items: baseline;
+      padding: 1.8rem 0;
+      border-top: 1px solid var(--edge);
+    }
+    .cap:nth-child(2) { transform: translateX(6vw); }
+    .cap:nth-child(3) { transform: translateX(12vw); border-bottom: 1px solid var(--edge); }
+    .cap__mark { color: var(--orange); font: 700 .7rem/1 Arial, sans-serif; letter-spacing: .14em; text-transform: uppercase; }
+    .cap h3 { margin: 0; font: 700 clamp(1.35rem, 2.4vw, 2.3rem)/1 Arial, sans-serif; text-transform: uppercase; }
+    .cap p { margin: 0; max-width: 42ch; font-size: .98rem; }
+
+    .contact {
+      min-height: 115vh;
+      align-items: end;
+      padding-bottom: 13vh;
+      background: linear-gradient(transparent, rgba(2, 17, 22, .82) 72%);
+    }
+    .contact__line { width: min(100%, 72rem); height: 1px; background: var(--edge); margin-bottom: 2rem; }
+    .contact h2 { max-width: 11ch; }
+    .contact__link {
+      display: inline-block;
+      margin-top: 2.4rem;
+      color: var(--orange);
+      font-size: clamp(1.2rem, 2.4vw, 2rem);
+      font-weight: 700;
+      text-decoration-thickness: 1px;
+      text-underline-offset: .35em;
+      transition: transform 140ms var(--ease-out), opacity 140ms var(--ease-out);
+    }
+    .contact__link:active { transform: scale(.97); }
+    .contact__footer { margin-top: 8vh; display: flex; justify-content: space-between; gap: 2rem; color: var(--muted); font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; }
+
+    .js .motion-copy { will-change: transform, opacity; }
+
+    @media (hover: hover) and (pointer: fine) {
+      .contact__link:hover { transform: translateX(.45rem); opacity: .82; }
+    }
+    @media (max-width: 700px) {
+      .hud { display: none; }
+      .scene { min-height: 105vh; padding-top: 17vh; }
+      .hero { min-height: 115vh; }
+      .hero__title { font-size: clamp(3.5rem, 17vw, 6rem); }
+      .hero__cue { display: none; }
+      .capabilities { min-height: 145vh; }
+      .cap { grid-template-columns: 5rem 1fr; gap: 1rem; }
+      .cap p { grid-column: 2; }
+      .cap:nth-child(2), .cap:nth-child(3) { transform: none; }
+      .contact__footer { align-items: flex-end; flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .motion-copy, .cap { transform: none !important; opacity: 1 !important; }
+      .hero__cue { display: none; }
+      .contact__link { transition: opacity 140ms var(--ease-out); }
+    }
+  </style>
+  <script>document.documentElement.classList.add('js')</script>
+  <script async src="https://cdn.jsdelivr.net/npm/es-module-shims@1.10.0/dist/es-module-shims.min.js"></script>
+  <script type="importmap">
+    {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.11/dist/lenis.min.js"></script>
+</head>
+<body>
+  <div class="fallback-world" aria-hidden="true"></div>
+  <canvas id="world" aria-label="An infinite cyan canyon of luminous monoliths receding into fog"></canvas>
+
+  <header class="nav">
+    <a class="brand" href="#top">DRIFT</a>
+    <a class="nav__contact" href="#contact">Open a channel</a>
+  </header>
+  <div class="hud" aria-hidden="true"><span>Flight</span><span class="hud__line"><span class="hud__fill"></span></span><span id="progress-label">000</span></div>
+
+  <main id="top">
+    <section class="scene hero">
+      <div class="scene__copy">
+        <h1 class="hero__title">We build places that don’t exist.</h1>
+        <p class="hero__sub">DRIFT is an immersive studio for spatial systems, real-time worlds, and stories you enter with your whole body.</p>
+      </div>
+      <div class="hero__cue" aria-hidden="true"><span>Scroll to fly</span><i></i></div>
+    </section>
+
+    <section class="scene beyond">
+      <div class="scene__copy motion-copy">
+        <h2>Beyond screens.<br>Into space.</h2>
+        <p>We turn ideas into navigable environments for launches, culture, architecture, and entertainment. Every project begins with a rule for how the world behaves.</p>
+      </div>
+    </section>
+
+    <section class="scene peak">
+      <div class="scene__copy motion-copy">
+        <h2>The world looks back.</h2>
+        <p>Presence changes the story. Gaze, gesture, distance, and movement become part of the medium.</p>
+      </div>
+    </section>
+
+    <section class="scene capabilities" id="capabilities">
+      <div class="capabilities__intro motion-copy">
+        <h2>Built to be entered.</h2>
+        <p>From first spatial rule to final frame, our teams combine direction, design, and real-time engineering.</p>
+      </div>
+      <div class="cap-list">
+        <article class="cap motion-copy">
+          <span class="cap__mark">Spatial systems</span>
+          <h3>World architecture</h3>
+          <p>Interaction grammars, navigation, scale, sound, and the logic that holds an experience together.</p>
+        </article>
+        <article class="cap motion-copy">
+          <span class="cap__mark">Real-time worlds</span>
+          <h3>Immersive production</h3>
+          <p>WebGL, spatial computing, installations, and high-performance environments built for the hardware people use.</p>
+        </article>
+        <article class="cap motion-copy">
+          <span class="cap__mark">Embodied stories</span>
+          <h3>Experience direction</h3>
+          <p>Narrative, motion, light, and responsive systems shaped into one precise emotional arc.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="scene contact" id="contact">
+      <div class="scene__copy motion-copy">
+        <div class="contact__line"></div>
+        <h2>Let’s make somewhere.</h2>
+        <a class="contact__link" href="mailto:hello@drift.world">hello@drift.world ↗</a>
+        <footer class="contact__footer"><span>Spatial computing / World building / Immersive direction</span><span>Available worldwide · 2026</span></footer>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+    import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+    import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const canvas = document.querySelector('#world');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance' });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, innerWidth < 700 ? 1.15 : 1.35));
+    renderer.setSize(innerWidth, innerHeight, false);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.18;
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x062b35);
+    scene.fog = new THREE.FogExp2(0x073842, 0.016);
+    const camera = new THREE.PerspectiveCamera(58, innerWidth / innerHeight, .1, 900);
+
+    const pillarVertex = `
+      varying vec3 vNormalW;
+      varying vec3 vWorld;
+      varying float vHeight;
+      void main() {
+        mat4 world = modelMatrix * instanceMatrix;
+        vec4 wp = world * vec4(position, 1.0);
+        vWorld = wp.xyz;
+        vNormalW = normalize(mat3(world) * normal);
+        vHeight = position.y;
+        gl_Position = projectionMatrix * viewMatrix * wp;
+      }
+    `;
+    const pillarFragment = `
+      uniform vec3 uFog;
+      uniform vec3 uCyan;
+      uniform vec3 uOrange;
+      uniform vec3 uSignal;
+      varying vec3 vNormalW;
+      varying vec3 vWorld;
+      varying float vHeight;
+      void main() {
+        vec3 viewDir = normalize(cameraPosition - vWorld);
+        float rim = pow(1.0 - abs(dot(normalize(vNormalW), viewDir)), 2.25);
+        float bands = smoothstep(.88, 1.0, sin(vHeight * 10.0) * .5 + .5) * .16;
+        float signal = 1.0 / (1.0 + .006 * pow(distance(vWorld, uSignal), 2.0));
+        vec3 color = vec3(.006, .045, .06) + uCyan * (rim * 1.8 + bands + .035);
+        color += uOrange * signal * max(dot(normalize(vNormalW), normalize(uSignal - vWorld)), 0.0) * 1.4;
+        float dist = distance(cameraPosition, vWorld);
+        float fogFactor = 1.0 - exp(-.00031 * dist * dist);
+        gl_FragColor = vec4(mix(color, uFog, clamp(fogFactor, 0.0, .97)), 1.0);
+      }
+    `;
+    const pillarMaterial = new THREE.ShaderMaterial({
+      vertexShader: pillarVertex,
+      fragmentShader: pillarFragment,
+      uniforms: {
+        uFog: { value: new THREE.Color(0x073842) },
+        uCyan: { value: new THREE.Color(0x28e5ff) },
+        uOrange: { value: new THREE.Color(0xff4a0a) },
+        uSignal: { value: new THREE.Vector3(0, 1, -305) }
+      }
+    });
+
+    const count = innerWidth < 700 ? 430 : 720;
+    const pillarGeometry = new THREE.BoxGeometry(1, 1, 1, 1, 4, 1);
+    const pillars = new THREE.InstancedMesh(pillarGeometry, pillarMaterial, count);
+    const dummy = new THREE.Object3D();
+    const random = mulberry32(481516);
+    for (let i = 0; i < count; i++) {
+      const z = 30 - random() * 610;
+      const side = random() < .5 ? -1 : 1;
+      const corridor = 5.5 + random() * 8 + Math.sin(z * .035) * 2.2;
+      const x = side * corridor + (random() - .5) * 34;
+      const h = 7 + Math.pow(random(), .55) * 38;
+      const w = .45 + random() * 2.1;
+      dummy.position.set(x, h * .5 - 7 - random() * 5, z);
+      dummy.scale.set(w, h, w * (.65 + random()));
+      dummy.rotation.set((random() - .5) * .13, random() * Math.PI, (random() - .5) * .1);
+      dummy.updateMatrix();
+      pillars.setMatrixAt(i, dummy.matrix);
+    }
+    pillars.instanceMatrix.needsUpdate = true;
+    scene.add(pillars);
+
+    const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x04191f, emissive: 0x007c92, emissiveIntensity: .18, roughness: .78, metalness: .2 });
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(90, 720, 1, 1), groundMaterial);
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.set(0, -8.2, -280);
+    scene.add(ground);
+
+    const signalMaterial = new THREE.MeshBasicMaterial({ color: 0xff5b16 });
+    const signal = new THREE.Mesh(new THREE.IcosahedronGeometry(3.2, 3), signalMaterial);
+    signal.position.set(0, 1, -305);
+    scene.add(signal);
+    const glowCanvas = document.createElement('canvas');
+    glowCanvas.width = glowCanvas.height = 128;
+    const glowContext = glowCanvas.getContext('2d');
+    const glowGradient = glowContext.createRadialGradient(64, 64, 1, 64, 64, 64);
+    glowGradient.addColorStop(0, 'rgba(255,245,220,1)');
+    glowGradient.addColorStop(.08, 'rgba(255,91,26,1)');
+    glowGradient.addColorStop(.34, 'rgba(255,54,5,.48)');
+    glowGradient.addColorStop(1, 'rgba(255,54,5,0)');
+    glowContext.fillStyle = glowGradient;
+    glowContext.fillRect(0, 0, 128, 128);
+    const signalTexture = new THREE.CanvasTexture(glowCanvas);
+    const signalGlow = new THREE.Sprite(new THREE.SpriteMaterial({ map: signalTexture, color: 0xff6b24, transparent: true, opacity: .92, blending: THREE.AdditiveBlending, depthTest: false, depthWrite: false }));
+    signalGlow.position.copy(signal.position);
+    signalGlow.scale.set(42, 42, 1);
+    scene.add(signalGlow);
+    const beamMaterial = new THREE.MeshBasicMaterial({ color: 0xff5b1a, transparent: true, opacity: .11, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
+    const beam = new THREE.Mesh(new THREE.CylinderGeometry(1.8, 13, 165, 24, 1, true), beamMaterial);
+    beam.rotation.x = Math.PI / 2;
+    beam.position.set(0, 1, -225);
+    scene.add(beam);
+
+    const sparkCount = innerWidth < 700 ? 550 : 1100;
+    const sparkPositions = new Float32Array(sparkCount * 3);
+    for (let i = 0; i < sparkCount; i++) {
+      sparkPositions[i * 3] = (random() - .5) * 54;
+      sparkPositions[i * 3 + 1] = -6 + random() * 28;
+      sparkPositions[i * 3 + 2] = 20 - random() * 620;
+    }
+    const sparkGeometry = new THREE.BufferGeometry();
+    sparkGeometry.setAttribute('position', new THREE.BufferAttribute(sparkPositions, 3));
+    const sparkMaterial = new THREE.PointsMaterial({ color: 0xff6b28, size: .13, transparent: true, opacity: .85, blending: THREE.AdditiveBlending, depthWrite: false, fog: true });
+    const sparks = new THREE.Points(sparkGeometry, sparkMaterial);
+    scene.add(sparks);
+
+    scene.add(new THREE.HemisphereLight(0x65ecff, 0x021014, 1.5));
+    const signalLight = new THREE.PointLight(0xff4b0b, 1600, 150, 1.4);
+    signalLight.position.copy(signal.position);
+    scene.add(signalLight);
+
+    const composer = new EffectComposer(renderer);
+    composer.addPass(new RenderPass(scene, camera));
+    const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 1.05, .72, .42);
+    composer.addPass(bloom);
+
+    const path = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0, 4, 30),
+      new THREE.Vector3(-2, 2, -78),
+      new THREE.Vector3(4, 7, -185),
+      new THREE.Vector3(-3, -1, -315),
+      new THREE.Vector3(0, -4, -435),
+      new THREE.Vector3(3, 7, -555)
+    ], false, 'catmullrom', .55);
+    const pointer = new THREE.Vector2();
+    const pointerTarget = new THREE.Vector2();
+    let pointerFrame = 0;
+    let progress = reduceMotion ? .14 : 0;
+    let disposed = false;
+    const look = new THREE.Vector3();
+    const base = new THREE.Vector3();
+
+    function mulberry32(seed) {
+      return function () {
+        let t = seed += 0x6D2B79F5;
+        t = Math.imul(t ^ t >>> 15, t | 1);
+        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+      };
+    }
+
+    function placeCamera() {
+      path.getPointAt(Math.min(progress, .998), base);
+      path.getPointAt(Math.min(progress + .018, 1), look);
+      pointer.lerp(pointerTarget, .055);
+      camera.position.copy(base);
+      camera.position.x += pointer.x * 2.5;
+      camera.position.y += pointer.y * 1.45;
+      look.x += pointer.x * 5.2;
+      look.y += pointer.y * 3.2;
+      camera.lookAt(look);
+      camera.rotateZ(-pointer.x * .032 + Math.sin(progress * Math.PI * 4) * .012);
+    }
+
+    function render(time = 0) {
+      if (disposed) return;
+      placeCamera();
+      if (!reduceMotion) {
+        sparks.position.y = Math.sin(time * .00028) * .8;
+        sparks.rotation.y = Math.sin(time * .00008) * .035;
+        signal.scale.setScalar(1 + Math.sin(time * .0022) * .07);
+      }
+      composer.render();
+    }
+
+    function onPointerMove(event) {
+      if (reduceMotion || pointerFrame) return;
+      pointerFrame = requestAnimationFrame(() => {
+        pointerTarget.set((event.clientX / innerWidth - .5) * 2, -(event.clientY / innerHeight - .5) * 2);
+        pointerFrame = 0;
+      });
+    }
+    addEventListener('pointermove', onPointerMove, { passive: true });
+
+    const gsap = window.gsap;
+    const ScrollTrigger = window.ScrollTrigger;
+    let lenis;
+    if (!reduceMotion && gsap && ScrollTrigger && window.Lenis) {
+      gsap.registerPlugin(ScrollTrigger);
+      lenis = new window.Lenis({ duration: 1.05, smoothWheel: true });
+      lenis.on('scroll', ScrollTrigger.update);
+      gsap.ticker.add((time) => lenis.raf(time * 1000));
+      gsap.ticker.lagSmoothing(0);
+
+      ScrollTrigger.create({
+        trigger: 'main', start: 'top top', end: 'bottom bottom', scrub: .55,
+        onUpdate(self) {
+          progress = self.progress;
+          gsap.set('.hud__fill', { scaleX: progress });
+          document.querySelector('#progress-label').textContent = String(Math.round(progress * 100)).padStart(3, '0');
+        }
+      });
+      gsap.utils.toArray('.motion-copy').forEach((element, index) => {
+        const fromX = index % 2 ? 90 : -70;
+        gsap.fromTo(element, { opacity: .22, x: fromX }, {
+          opacity: 1, x: 0, ease: 'none',
+          scrollTrigger: { trigger: element, start: 'top 92%', end: 'center 58%', scrub: .5 }
+        });
+      });
+      gsap.ticker.add(render);
+      ScrollTrigger.refresh();
+    } else {
+      render(0);
+    }
+
+    function onResize() {
+      camera.aspect = innerWidth / innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setPixelRatio(Math.min(devicePixelRatio, innerWidth < 700 ? 1.15 : 1.35));
+      renderer.setSize(innerWidth, innerHeight, false);
+      composer.setSize(innerWidth, innerHeight);
+      render(performance.now());
+    }
+    addEventListener('resize', onResize, { passive: true });
+
+    function teardown() {
+      if (disposed) return;
+      disposed = true;
+      removeEventListener('pointermove', onPointerMove);
+      removeEventListener('resize', onResize);
+      if (pointerFrame) cancelAnimationFrame(pointerFrame);
+      if (gsap) gsap.ticker.remove(render);
+      ScrollTrigger?.getAll().forEach(trigger => trigger.kill());
+      lenis?.destroy();
+      scene.traverse(object => {
+        object.geometry?.dispose();
+        if (Array.isArray(object.material)) object.material.forEach(material => material.dispose());
+        else object.material?.dispose();
+      });
+      composer.dispose();
+      signalTexture.dispose();
+      renderer.dispose();
+      renderer.forceContextLoss();
+    }
+    addEventListener('pagehide', teardown, { once: true });
+  </script>
+</body>
+</html>
