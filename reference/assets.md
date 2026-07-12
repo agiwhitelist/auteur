@@ -134,6 +134,8 @@ Rung 3 is the default answer to "we generated two images and want the video feel
 ```bash
 # Hero video → H.264 baseline (plays everywhere incl. iOS), streaming-ready, target ≤2MB
 ffmpeg -i src.mp4 -c:v libx264 -profile:v baseline -level 3.1 -pix_fmt yuv420p -movflags +faststart -crf 23 -an hero.mp4
+# SCROLL-SCRUBBED video is different — a tiny GOP makes frame-accurate seeking cheap (see scroll-flight.md)
+ffmpeg -i src.mp4 -an -vf "unsharp=5:5:0.8:5:5:0.0" -c:v libx264 -preset slow -crf 20 -pix_fmt yuv420p -g 8 -keyint_min 8 -sc_threshold 0 -movflags +faststart scrub.mp4
 # WebM alternative for Chromium (smaller at same quality)
 ffmpeg -i src.mp4 -c:v libvpx-vp9 -crf 30 -b:v 0 -an hero.webm
 # Poster (first frame) for instant paint + reduced-motion fallback

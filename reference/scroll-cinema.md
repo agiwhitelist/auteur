@@ -24,6 +24,8 @@ Stack default 2026: **GSAP 3.13 + ScrollTrigger 3.13 (free), Lenis 1.3, Three.js
 
 Viewer scrolls — a pre-generated video scrubs forward/backward in sync with scroll progress. First frame = one composition, last frame = another (product revealed, camera moved). This is the primary wow technique: igloo.website, Runway, Veo launch pages, Apple AirPods.
 
+> The GSAP recipe below is the minimal single-clip scrubber. For a **photoreal, multi-scene "fly through the world"** — mobile/iOS-hardened, blob-loaded, seek-coalesced, with crossfade or seamless seams — use the drop-in engine in `templates/scroll-flight-engine.js` and the full recipe in **`reference/scroll-flight.md`** (it also carries the critical `-g 8` encode and the SSIM seam gate). Reach for that when the hero is footage/AI-video rather than a single generated clip.
+
 **Video prep:**
 ```bash
 # H.264 baseline for Safari/old Android, VP9 for Chrome

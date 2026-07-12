@@ -98,11 +98,12 @@ node scripts/motionqa.mjs docs/showcase/swarm --headed
 
 ```
 SKILL.md              the skill Claude Code loads
-reference/*.md        the recipes: direct, scroll-cinema, motion, assets, taste, verify, build
+reference/*.md        the recipes: direct, scroll-cinema, scroll-flight, motion, assets, taste, verify, build
 scripts/slopscan.mjs  the anti-slop linter (zero deps)
 scripts/motionqa.mjs  the Playwright motion + a11y gate
 scripts/shoot.mjs     responsive screenshot capture
-templates/*.md        commit-sheet, storyboard, cinema-QA, design templates
+templates/            commit-sheet, storyboard, cinema-QA, design templates
+                      + scroll-flight-engine.js — drop-in photoreal scroll-scrubbed-video engine
 docs/                 the landing + the four live showcase sites (GitHub Pages)
 ```
 
@@ -121,6 +122,14 @@ Every site auteur ships: `prefers-reduced-motion` → a rich still, never blank;
 all copy readable with JavaScript off; no full-frame strobe; responsive at
 390 / 768 / 1440 with no horizontal overflow. These are enforced, not aspired.
 
+## Credits
+
+The photoreal scroll-scrubbed-video engine (`templates/scroll-flight-engine.js`)
+and its technique are adapted from **[scroll-world](https://github.com/cth9191/scroll-world)**
+by cyw (MIT) — a sibling Claude Code skill focused on AI-video camera flights.
+auteur pairs it with its own asset generation and slopscan / motionqa gates.
+
 ## License
 
-MIT © agiwhitelist — see [LICENSE](LICENSE).
+MIT © agiwhitelist — see [LICENSE](LICENSE). Vendored components retain their
+own MIT notices (see file headers).
