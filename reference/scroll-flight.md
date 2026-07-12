@@ -20,6 +20,37 @@ edge cases you do NOT want to re-derive. Read its header for the full config API
 
 They compose: a WebGL hero can hand off into a scrubbed-video mid-section.
 
+## ⚠️ AI clips barely move the camera — the scroll-dolly does the travelling
+
+The single most important thing to know here. **`grok image_to_video` (and
+most image→video models) animate a still *ambiently* — light shimmers, water
+drifts, particles float — but they do NOT fly the camera through the scene.**
+Verified on disk: a clip's first and last frame are near-identical. So a scene
+built only from a raw AI clip reads as *a slightly-moving photo*, not a journey.
+This is the #1 reason a scroll-flight looks like a slideshow.
+
+The fix lives in the engine, not the prompt: `scroll-flight-engine.js` applies a
+**scroll-driven camera dolly** — as you scroll through a scene, it pushes the
+whole scene IN (scale) and drifts it down, inside the scale overscan so edges
+never reveal. *That* is what manufactures forward/descent travel; the clip's
+`currentTime` scrub only adds the ambient life on top. Consequences:
+
+- **Don't over-invest in per-clip motion.** A near-static clip + the dolly looks
+  the same as an aggressively-prompted clip + the dolly. Prompt for *mood and
+  ambient life* (drifting particles, light, creatures), not "fast camera dash"
+  you won't get.
+- **Stills and clips are interchangeable.** A scene with only a `still` gets the
+  same dolly, so it reads identically to a video scene. Mix freely — ship the
+  clips you reliably get, fill the rest with stills, the dolly unifies them.
+  (ABYSS showcase: 2 video scenes + 3 stills, indistinguishable.)
+- **Pick worlds whose medium drifts** — underwater, clouds, space, dust, smoke.
+  Ambient drift hides the lack of camera-baked motion; a dry static landscape
+  exposes it.
+- Real camera travel baked into the footage needs a true flythrough model
+  (Higgsfield/Runway/Veo) or the 2.5D depth-parallax route (still → depth map →
+  WebGL camera through the layers). The dolly is the pragmatic default that
+  needs neither.
+
 ## The pipeline (auteur's toolchain)
 
 1. **Scene stills** — one anchor still first, get art-direction approval, then
