@@ -60,6 +60,15 @@
 
     /* ---------- SHARED SECTION ---------- */
     section.band{padding:clamp(88px,14vh,180px) 0;border-top:1px solid var(--line)}
+    /* ambient ground (auteur reference/ambient-backgrounds.md): ONE quiet treatment behind the
+       content bands only (not the hero): a warm brand-hue mesh + a faint static grain. Pure
+       CSS/SVG, zero JS, static by construction so prefers-reduced-motion is satisfied for free. */
+    main{position:relative;isolation:isolate}
+    main::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:
+      radial-gradient(55% 40% at 84% 5%,color-mix(in srgb,var(--gold) 5%,transparent),transparent 60%),
+      radial-gradient(50% 46% at 7% 97%,color-mix(in srgb,var(--rec) 4%,transparent),transparent 55%)}
+    main::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.05;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='170' height='170'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='170' height='170' filter='url(%23g)'/%3E%3C/svg%3E");background-size:170px 170px}
     .kicker{display:flex;align-items:baseline;gap:1em;margin-bottom:clamp(30px,5vh,58px)}
     .kicker .n{font:600 .8rem/1 var(--mono);color:var(--rec);letter-spacing:.1em}
     .kicker h2{margin:0;font:900 clamp(2rem,5.4vw,4.6rem)/1 var(--disp);letter-spacing:-.03em;text-wrap:balance}
