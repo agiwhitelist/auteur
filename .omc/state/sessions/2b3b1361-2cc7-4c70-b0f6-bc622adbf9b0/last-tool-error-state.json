@@ -1,0 +1,7 @@
+{
+  "tool_name": "WebFetch",
+  "tool_input_preview": "{\"url\":\"https://motionsites.ai/\",\"prompt\":\"What is this site? List every website example it showcases, and for each: the site name, the visual/motion technique or style it demonstrates, and any prompt...",
+  "error": "timeout of 60000ms exceeded",
+  "timestamp": "2026-07-12T10:14:07.893Z",
+  "retry_count": 1
+}
