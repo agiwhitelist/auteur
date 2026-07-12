@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>ABYSS &mdash; Deep-Ocean Research</title>
+  <meta name="description" content="A photoreal scroll-scrubbed descent from the sunlit surface to the deep-sea floor. Dive through the ocean by scrolling. ABYSS &mdash; a deep-ocean research collective.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%2305090f'/%3E%3Ccircle cx='32' cy='30' r='12' fill='none' stroke='%232fd8d0' stroke-width='3'/%3E%3Ccircle cx='32' cy='30' r='4' fill='%232fd8d0'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --sw-bg: #05090f;
+      --sw-ink: #eaf6f8;
+      --sw-ink-soft: #8ea6ad;
+      --sw-accent: #2fd8d0;
+      --sw-font-display: Georgia, "Times New Roman", serif;
+      --sw-font-body: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    html, body { margin: 0; padding: 0; background: var(--sw-bg); color: var(--sw-ink);
+      font-family: var(--sw-font-body); overflow-x: hidden; }
+    .sw-root {
+      --sw-bg: #05090f; --sw-ink: #eaf6f8; --sw-ink-soft: #8ea6ad; --sw-accent: #2fd8d0;
+      --sw-font-display: Georgia, "Times New Roman", serif;
+      --sw-font-body: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .abyss-shell { min-height: 100vh; }
+    [data-sw-seo] { position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+    [data-sw-seo] h1, [data-sw-seo] h2 { font-family: var(--sw-font-display); font-weight: 700; letter-spacing: -0.01em; }
+    [data-sw-seo] a { color: inherit; }
+    .abyss-credit { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); z-index: 70;
+      font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: color-mix(in srgb, var(--sw-ink) 32%, transparent); pointer-events: none; opacity: 0.6; }
+  </style>
+</head>
+<body>
+  <div id="world" class="abyss-shell sw-root">
+    <div data-sw-seo>
+      <h1>ABYSS</h1>
+      <p>A deep-ocean research collective. Pilot a continuous photoreal descent from the sunlit surface to the abyssal floor by scrolling &mdash; five zones of the sea, each darker and stranger than the last.</p>
+      <h2>0m &mdash; The Surface</h2>
+      <p>Where the light still lives. Sunbeams fracture the turquoise shallows and silver schools turn as one. Every dive begins in the glow.</p>
+      <h2>-30m &mdash; The Reef Wall</h2>
+      <p>A city that breathes in colour. The reef falls away into blue, dense with coral and quick with fish, before the drop-off swallows the light.</p>
+      <h2>-200m &mdash; The Blue</h2>
+      <p>The last light lets go. In the open twilight a vast shadow passes &mdash; a whale, unhurried &mdash; while marine snow drifts up as you sink.</p>
+      <h2>-1000m &mdash; The Midnight Zone</h2>
+      <p>Here the dark makes its own light. Bioluminescent jellies and sparks of plankton burn cold and blue in water that has never seen the sun.</p>
+      <h2>-4000m &mdash; The Abyss</h2>
+      <p>The floor of the world, unwitnessed. A vent glows in the black, and something vast moves at the edge of the light. Pressure, silence, and the beginning of everything.</p>
+      <p><a href="#top">Join a dive</a> · <a href="#top">Research &amp; method</a></p>
+    </div>
+  </div>
+
+  <div class="abyss-credit">ABYSS · scroll-flight showcase</div>
+
+  <script src="./assets/scroll-flight-engine.js"></script>
+  <script>
+    (function () {
+      const container = document.getElementById('world');
+      const palette = {
+        '--sw-bg': '#05090f', '--sw-ink': '#eaf6f8', '--sw-ink-soft': '#8ea6ad', '--sw-accent': '#2fd8d0',
+        '--sw-font-display': 'Georgia, "Times New Roman", serif',
+        '--sw-font-body': 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+      };
+      Object.entries(palette).forEach(([k, v]) => {
+        document.documentElement.style.setProperty(k, v);
+        container.style.setProperty(k, v);
+      });
+
+      const config = {
+        brand: { name: 'ABYSS', href: '#top' },
+        hint: 'scroll to dive',
+        nav: true,
+        atmosphere: true,
+        diveScroll: 1.6,
+        crossfade: 0.14,
+        scrollMobileFactor: 1.3,
+        sections: [
+          {
+            id: 'surface', label: 'Surface',
+            still: 'assets/surface.webp', poster: 'assets/surface-poster.webp', clip: 'assets/vid/surface.mp4',
+            accent: '#45d8dc',
+            eyebrow: '0m · THE SURFACE',
+            title: 'Where the light still lives',
+            body: 'Sunbeams fracture the turquoise shallows and silver schools turn as one. Every dive begins in the glow.',
+            tags: ['Sunlit Zone', 'Schooling Fish', 'Origin']
+          },
+          {
+            id: 'reef', label: 'Reef',
+            still: 'assets/reef.webp', poster: 'assets/reef-poster.webp', clip: 'assets/vid/reef.mp4',
+            accent: '#2ec9c0',
+            eyebrow: '-30m · THE REEF WALL',
+            title: 'A city that breathes in colour',
+            body: 'The reef falls away into blue, dense with coral and quick with fish, before the drop-off swallows the light.',
+            tags: ['Coral Wall', 'Drop-off', 'Teeming']
+          },
+          {
+            id: 'bluewater', label: 'The Blue',
+            still: 'assets/bluewater.webp',
+            accent: '#2a9fd0',
+            eyebrow: '-200m · THE BLUE',
+            title: 'The last light lets go',
+            body: 'In the open twilight a vast shadow passes, a whale, unhurried, while marine snow drifts up as you sink.',
+            tags: ['Twilight Zone', 'Whale', 'Marine Snow']
+          },
+          {
+            id: 'glow', label: 'Midnight',
+            still: 'assets/glow.webp',
+            accent: '#37e2da',
+            eyebrow: '-1000m · THE MIDNIGHT ZONE',
+            title: 'Here the dark makes its own light',
+            body: 'Bioluminescent jellies and sparks of plankton burn cold and blue in water that has never seen the sun.',
+            tags: ['Bioluminescence', 'Midnight Zone', 'Cold Light']
+          },
+          {
+            id: 'abyss', label: 'Abyss',
+            still: 'assets/abyss.webp',
+            accent: '#2f9aa2',
+            eyebrow: '-4000m · THE ABYSS',
+            title: 'The floor of the world, unwitnessed',
+            body: 'A vent glows in the black, and something vast moves at the edge of the light. Pressure, silence, and the beginning of everything.',
+            tags: ['Hadal Zone', 'Hydrothermal', 'The Deep'],
+            cta: {
+              primary: { label: 'Join a dive', href: '#top' },
+              secondary: { label: 'Research & method', href: '#top' }
+            }
+          }
+        ],
+        connectors: []
+      };
+
+      if (typeof window.mountScrollWorld === 'function') {
+        window.mountScrollWorld(container, config);
+      } else {
+        console.error('scroll-flight-engine not loaded');
+      }
+    })();
+  </script>
+</body>
+</html>

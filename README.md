@@ -20,7 +20,7 @@ check.**
 
 ## The proof
 
-Don't take the pitch — open the five sites. Each was built by auteur, and each
+Don't take the pitch — open the six sites. Each was built by auteur, and each
 passes the skill's own linter with **0 fails / 0 warns**:
 
 | Site | Technique | Live |
@@ -30,9 +30,11 @@ passes the skill's own linter with **0 fails / 0 warns**:
 | **SWARM** | 131,072 GPU particles on a curl-noise field, settling into a wordmark | [open ↗](https://agiwhitelist.github.io/auteur/showcase/swarm/) |
 | **DRIFT** | An atmospheric 3D world of monoliths + volumetric fog you fly through | [open ↗](https://agiwhitelist.github.io/auteur/showcase/drift/) |
 | **ATLAS** | A photoreal camera flight (dunes → canyon → coast → summit) — real AI video, scrubbed by scroll | [open ↗](https://agiwhitelist.github.io/auteur/showcase/atlas/) |
+| **ABYSS** | A photoreal ocean dive (surface → reef → twilight → bioluminescence → abyss) — video + a scroll-driven camera dolly | [open ↗](https://agiwhitelist.github.io/auteur/showcase/abyss/) |
 
-FLUX / STATIC / SWARM / DRIFT are real-time WebGL; **ATLAS** is the video-scrub
-tier (see `reference/scroll-flight.md`). The landing page itself is a sixth —
+FLUX / STATIC / SWARM / DRIFT are real-time WebGL; **ATLAS** and **ABYSS** are the
+video-scrub tier (see `reference/scroll-flight.md`) — photoreal footage with a
+scroll-driven camera dolly through it. The landing page itself is a seventh —
 built by the same discipline it sells.
 
 > There are **no benchmark numbers** anywhere in this repo. auteur is a design

@@ -7,12 +7,16 @@
    Gemini, real footage). See reference/scroll-flight.md for the full recipe.
 
    VENDORED from scroll-world (github.com/cth9191/scroll-world), MIT (c) 2026 cyw.
-   Adapted for auteur — only two changes from upstream:
+   Adapted for auteur — three changes from upstream:
      1. default --sw-accent shifted off the 250-290 deg AI-purple (auteur taste);
         every real site overrides --sw-accent anyway.
      2. the auteur-allow line below, so slopscan permits the engine's ONE scroll
         listener (rAF-gated + passive; smoothed-scroll libs like Lenis fight
         frame-accurate currentTime scrubbing, so native scroll is correct here).
+     3. a scroll-driven camera dolly (see "auteur scroll-dolly" in read()): the
+        scene pushes IN and drifts down as you scroll through it, manufacturing
+        forward/descent travel on top of AI clips that only animate ambiently and
+        don't move the camera themselves.
    ========================================================================== */
 /* auteur-allow: RAW_SCROLL_LISTENER -- frame-accurate video scrub needs a native rAF-gated passive scroll listener; smoothed-scroll libraries fight currentTime seeking */
 /* ============================================================================
@@ -322,10 +326,13 @@ function mountScrollWorld(container, config) {
       const op = smooth(1 - outside / fade);
       s.el.style.opacity = op; s.visible = op > 0.001;
       s.el.style.zIndex = (i === ci) ? '120' : String(100 + Math.round(op * 10));
-      if (!s.hasClip || !s.ready) {
-        const sc = reduce ? 1 : 1.03 + local * 0.14;
-        s.img.style.transform = `translateX(${stageX - 2}vw) scale(${sc.toFixed(3)})`;
-      }
+      // auteur scroll-dolly: push the camera INTO the scene and drift down as you scroll
+      // through it. Manufactures forward/descent travel on top of near-static AI clips (the
+      // clip's currentTime scrub still runs below). Applied to the scene (video + still).
+      // dy stays inside the scale overscan so scene edges never reveal the page background.
+      const push = reduce ? 1 : 1.05 + local * 0.14;
+      const dy = reduce ? 0 : (0.5 - local) * 2.4;
+      s.el.style.transform = `translateY(${dy.toFixed(2)}vh) scale(${push.toFixed(3)})`;
     }
 
     for (let i = 0; i < N; i++) {
@@ -472,7 +479,7 @@ function injectCSS() {
   .sw-nav__item:hover{color:var(--sw-ink);} .sw-nav__item.is-active{color:#fff;background:var(--sw-accent);}
   .sw-topcta{text-decoration:none;font-weight:600;font-size:.9rem;color:#fff;background:var(--sw-ink);padding:10px 20px;border-radius:999px;white-space:nowrap;}
   .sw-stage{position:fixed;inset:0;z-index:10;pointer-events:none;}
-  .sw-scene{position:absolute;inset:0;opacity:0;overflow:hidden;will-change:opacity;}
+  .sw-scene{position:absolute;inset:0;opacity:0;overflow:hidden;will-change:opacity,transform;transform-origin:50% 46%;}
   .sw-scene__video,.sw-scene__still{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 42%;}
   .sw-scene__still{will-change:transform;} .sw-scene.has-clip .sw-scene__still{opacity:0;} .sw-scene__video{z-index:1;}
   .sw-copylayer{position:fixed;inset:0;z-index:20;pointer-events:none;}
