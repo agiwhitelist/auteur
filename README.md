@@ -20,7 +20,7 @@ check.**
 
 ## The proof
 
-Don't take the pitch — open the four sites. Each was built by auteur, and each
+Don't take the pitch — open the five sites. Each was built by auteur, and each
 passes the skill's own linter with **0 fails / 0 warns**:
 
 | Site | Technique | Live |
@@ -29,8 +29,11 @@ passes the skill's own linter with **0 fails / 0 warns**:
 | **STATIC** | Broadcast-glitch type you can shred with a fast drag, crisp at rest | [open ↗](https://agiwhitelist.github.io/auteur/showcase/static/) |
 | **SWARM** | 131,072 GPU particles on a curl-noise field, settling into a wordmark | [open ↗](https://agiwhitelist.github.io/auteur/showcase/swarm/) |
 | **DRIFT** | An atmospheric 3D world of monoliths + volumetric fog you fly through | [open ↗](https://agiwhitelist.github.io/auteur/showcase/drift/) |
+| **ATLAS** | A photoreal camera flight (dunes → canyon → coast → summit) — real AI video, scrubbed by scroll | [open ↗](https://agiwhitelist.github.io/auteur/showcase/atlas/) |
 
-The landing page itself is a fifth — built by the same discipline it sells.
+FLUX / STATIC / SWARM / DRIFT are real-time WebGL; **ATLAS** is the video-scrub
+tier (see `reference/scroll-flight.md`). The landing page itself is a sixth —
+built by the same discipline it sells.
 
 > There are **no benchmark numbers** anywhere in this repo. auteur is a design
 > discipline, not a system with a throughput figure. The one quantitative claim

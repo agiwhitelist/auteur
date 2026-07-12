@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>ATLAS &mdash; Expedition Field Research</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230a0806'/%3E%3Cpath d='M20 46 L32 18 L44 46 M25 38 L39 38' stroke='%23c17a3f' stroke-width='4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <meta name="description" content="A photoreal scroll-scrubbed flight through vast natural worlds. Pilot the camera through dunes, canyons, coasts and summits. ATLAS &mdash; field research &amp; expedition studio.">
+  <style>
+    :root {
+      --sw-bg: #0a0806;
+      --sw-ink: #f5f1e9;
+      --sw-ink-soft: #a89f8f;
+      --sw-accent: #c17a3f;
+      --sw-font-display: Georgia, "Times New Roman", serif;
+      --sw-font-body: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--sw-bg);
+      color: var(--sw-ink);
+      font-family: var(--sw-font-body);
+      overflow-x: hidden;
+    }
+
+    /* Atlas overrides for cinematic dark expedition feel */
+    .sw-root {
+      --sw-bg: #0a0806;
+      --sw-ink: #f5f1e9;
+      --sw-ink-soft: #a89f8f;
+      --sw-accent: #c17a3f;
+      --sw-font-display: Georgia, "Times New Roman", serif;
+      --sw-font-body: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    /* Subtle page shell */
+    .atlas-shell {
+      min-height: 100vh;
+    }
+
+    /* SEO block (hidden by engine on mount; visible with JS off or crawlers) */
+    [data-sw-seo] {
+      position: absolute;
+      left: -9999px;
+      top: auto;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+    }
+
+    [data-sw-seo] h1,
+    [data-sw-seo] h2 {
+      font-family: var(--sw-font-display);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    [data-sw-seo] a {
+      color: inherit;
+    }
+
+    /* Tiny credit / footer hint for the showcase (non-intrusive) */
+    .atlas-credit {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 70;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--sw-ink) 35%, transparent);
+      pointer-events: none;
+      opacity: 0.6;
+    }
+  </style>
+</head>
+<body>
+  <div id="world" class="atlas-shell sw-root">
+    <!-- Plain markup SEO / no-JS / crawler copy. Engine hides this on mount. -->
+    <div data-sw-seo>
+      <h1>ATLAS</h1>
+      <p>An expedition and field-research studio. Pilot a continuous photoreal camera flight through four vast natural worlds by scrolling. Cinematic, grounded, real.</p>
+
+      <h2>01 &mdash; Dunes</h2>
+      <p>Endless dunes under the first gold. The desert breathes in the low light. Long shadows mark the passage of wind across time. This is where every expedition begins.</p>
+
+      <h2>02 &mdash; Canyon</h2>
+      <p>Light carves stone in hidden silence. A slot canyon holds the day in fractured beams. Layer upon layer, the rock remembers every season.</p>
+
+      <h2>03 &mdash; Coast</h2>
+      <p>Where the storm meets the ancient shore. Sea stacks stand defiant against the Atlantic. Spray rises, light falters, and the horizon dissolves into night.</p>
+
+      <h2>04 &mdash; Summit</h2>
+      <p>Above the clouds, the stars take the watch. At the roof of the world, the last ember of day yields to the first cold stars. The expedition reaches its quiet summit.</p>
+
+      <p><a href="#top">Join the next expedition</a> · <a href="#top">Field notes &amp; method</a></p>
+    </div>
+  </div>
+
+  <div class="atlas-credit">ATLAS · scroll-flight showcase</div>
+
+  <script src="./assets/scroll-flight-engine.js"></script>
+  <script>
+    (function () {
+      const container = document.getElementById('world');
+
+      // Committed warm expedition palette (dark cinematic, amber/terracotta family, no purple/blue)
+      // Applied on root + container for engine + any shell styles
+      const palette = {
+        '--sw-bg': '#0a0806',
+        '--sw-ink': '#f5f1e9',
+        '--sw-ink-soft': '#a89f8f',
+        '--sw-accent': '#c17a3f',
+        '--sw-font-display': 'Georgia, "Times New Roman", serif',
+        '--sw-font-body': 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+      };
+      Object.entries(palette).forEach(([k, v]) => {
+        document.documentElement.style.setProperty(k, v);
+        container.style.setProperty(k, v);
+      });
+
+      const config = {
+        brand: { name: 'ATLAS', href: '#top' },
+        hint: 'scroll to fly',
+        nav: true,
+        atmosphere: true,
+        diveScroll: 1.38,
+        connScroll: 0.82,
+        crossfade: 0.13,
+        scrollMobileFactor: 1.28,
+
+        sections: [
+          {
+            id: 'dunes',
+            label: 'Dunes',
+            still: 'assets/dunes.webp',
+            poster: 'assets/dunes-poster.webp',
+            clip: 'assets/vid/dunes.mp4',
+            accent: '#c88a42',
+            eyebrow: 'DAWN · THE THRESHOLD',
+            title: 'Endless dunes under the first gold',
+            body: 'The desert breathes in the low light. Long shadows mark the passage of wind across time. This is where every expedition begins.',
+            tags: ['Golden Hour', 'Sand Sea', 'Origin']
+          },
+          {
+            id: 'canyon',
+            label: 'Canyon',
+            still: 'assets/canyon.webp',
+            poster: 'assets/canyon-poster.webp',
+            clip: 'assets/vid/canyon.mp4',
+            accent: '#a25c2f',
+            eyebrow: 'THE DEPTHS',
+            title: 'Light carves stone in hidden silence',
+            body: 'A slot canyon holds the day in fractured beams. Layer upon layer, the rock remembers every season.',
+            tags: ['Slot Canyon', 'Light Shafts', 'Stratified Time']
+          },
+          {
+            id: 'coast',
+            label: 'Coast',
+            still: 'assets/coast.webp',
+            poster: 'assets/coast-poster.webp',
+            clip: 'assets/vid/coast.mp4',
+            accent: '#8d5f3a',
+            eyebrow: 'DUSK · THE EDGE',
+            title: 'Where the storm meets the ancient shore',
+            body: 'Sea stacks stand defiant against the Atlantic. Spray rises, light falters, and the horizon dissolves into night.',
+            tags: ['Storm Coast', 'Sea Stacks', 'Tidal Edge']
+          },
+          {
+            id: 'summit',
+            label: 'Summit',
+            still: 'assets/summit.webp',
+            poster: 'assets/summit-poster.webp',
+            clip: 'assets/vid/summit.mp4',
+            accent: '#b46f3f',
+            eyebrow: 'LAST LIGHT · THE APEX',
+            title: 'Above the clouds, the stars take the watch',
+            body: 'At the roof of the world, the last ember of day yields to the first cold stars. The expedition reaches its quiet summit.',
+            tags: ['Alpine', 'Above Clouds', 'Celestial'],
+            cta: {
+              primary: { label: 'Join the next expedition', href: '#top' },
+              secondary: { label: 'Field notes & method', href: '#top' }
+            }
+          }
+        ],
+
+        connectors: []
+      };
+
+      if (typeof window.mountScrollWorld === 'function') {
+        window.mountScrollWorld(container, config);
+      } else {
+        console.error('scroll-flight-engine not loaded');
+      }
+    })();
+  </script>
+</body>
+</html>
