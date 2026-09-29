@@ -282,7 +282,11 @@ async function fingerprint(ctx, url) {
 // the real URL behind affiliate redirects — for those, find URLs with WebSearch and pass them
 // positionally.
 async function harvestAwwwards(ctx, tag, text, n) {
-  const page = await ctx.newPage();
+  // awwwards' WAF answers a spoofed desktop UA with a bare 403 (9 bytes,
+  // zero anchors) but serves the listing to the browser's own UA. The caller
+  // ctx pins a Windows/Chrome UA, so the harvest needs its own context.
+  const hctx = await ctx.browser().newContext({ viewport: { width, height: 900 }, ignoreHTTPSErrors: true });
+  const page = await hctx.newPage();
   const base = 'https://www.awwwards.com/websites/';
   const url = text ? `${base}?text=${encodeURIComponent(text)}` : tag ? `${base}${tag}/` : base;
   const found = [];
@@ -290,7 +294,10 @@ async function harvestAwwwards(ctx, tag, text, n) {
     await open(page, url, 6000);
     const slugs = await page.evaluate(() =>
       [...new Set([...document.querySelectorAll('a[href*="/sites/"]')].map(a => a.getAttribute('href')).filter(h => h && h.startsWith('/sites/')))]);
-    if (!slugs.length) console.error(`[refscout] awwwards listing returned no cards for ${url}`);
+    if (!slugs.length) {
+      const said = await page.evaluate(() => document.body.innerText.trim().slice(0, 60));
+      console.error(`[refscout] awwwards listing returned no cards for ${url} (page says: ${JSON.stringify(said)}). The listing may have been blocked, or the search term matched nothing - try the bare listing (drop --search).`);
+    }
     for (const slug of slugs.slice(0, n)) {
       try {
         await open(page, 'https://www.awwwards.com' + slug, 3500);
@@ -309,7 +316,7 @@ async function harvestAwwwards(ctx, tag, text, n) {
     }
   } catch (e) {
     console.error(`[refscout] awwwards harvest failed: ${e.message.split('\n')[0]}`);
-  } finally { await page.close(); }
+  } finally { await page.close(); await hctx.close(); }
   return found;
 }
 
